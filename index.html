@@ -16,7 +16,8 @@ input{padding:10px;border-radius:8px;border:none;background:#0b0f10;color:#fff;}
 .card:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(0,0,0,0.4);}
 .card.locked{filter:grayscale(.2) blur(.2px);cursor:not-allowed;}
 .card.revealed{background:rgba(212,175,55,0.1);}
-.card .label{color:#bfc6c9;}
+.card .label{color:#bfc6c9;text-align:center;}
+.card .prize{position:absolute;bottom:10px;width:100%;text-align:center;font-size:14px;color:#d4af37;font-weight:700;}
 .badge{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.4);color:#d4af37;padding:4px 6px;border-radius:6px;font-weight:700;}
 .result-area{margin-top:16px;}
 .small{font-size:13px;color:#bfc6c9;}
@@ -36,48 +37,60 @@ input{padding:10px;border-radius:8px;border:none;background:#0b0f10;color:#fff;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
 const firebaseConfig = {
-apiKey: "AIzaSyDlpuf_uIlpmr2ybAqpJ2GTTRW-t86PGf0",
-authDomain: "hadiahnatal-a033b.firebaseapp.com",
-databaseURL: "https://hadiahnatal-a033b-default-rtdb.firebaseio.com",
-projectId: "hadiahnatal-a033b",
-storageBucket: "hadiahnatal-a033b.firebasestorage.app",
-messagingSenderId: "577153304596",
-appId: "1:577153304596:web:5f255e886a379ccb12bf01",
-measurementId: "G-C5Q83YQ6SK"
+  apiKey: "AIzaSyDlpuf_uIlpmr2ybAqpJ2GTTRW-t86PGf0",
+  authDomain: "hadiahnatal-a033b.firebaseapp.com",
+  databaseURL: "https://hadiahnatal-a033b-default-rtdb.firebaseio.com",
+  projectId: "hadiahnatal-a033b",
+  storageBucket: "hadiahnatal-a033b.firebasestorage.app",
+  messagingSenderId: "577153304596",
+  appId: "1:577153304596:web:5f255e886a379ccb12bf01",
+  measurementId: "G-C5Q83YQ6SK"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const dbRef = ref(db,"gameConfig/cards");
 
-const gridWrap=document.getElementById('gridWrap');
-const verifyBtn=document.getElementById('verifyBtn');
-const codeInput=document.getElementById('codeInput');
-const status=document.getElementById('status');
-const resultArea=document.getElementById('resultArea');
+const gridWrap = document.getElementById('gridWrap');
+const verifyBtn = document.getElementById('verifyBtn');
+const codeInput = document.getElementById('codeInput');
+const status = document.getElementById('status');
+const resultArea = document.getElementById('resultArea');
 
-let serverConfig=null;
-let unlocked=false;
-let revealed=new Set();
+let serverConfig = null;
+let unlocked = false;
+let revealed = new Set();
+const MAX_SELECTION = 3;
+
+// Hadiah kartu
+const PRIZES = {
+  'Platinum':'10,000',
+  'Diamond':'25,000',
+  'Super Diamond':'500,000'
+};
 
 function buildGrid(){
-  gridWrap.innerHTML='';
+  gridWrap.innerHTML = '';
   for(let i=0;i<9;i++){
-    const c=document.createElement('div');
-    c.className='card locked';
-    c.dataset.index=i;
-    c.innerHTML=`<div class="label">Kartu ${i+1}</div><div class="badge">?</div>`;
-    c.addEventListener('click',onCardClick);
+    const c = document.createElement('div');
+    c.className = 'card locked';
+    c.dataset.index = i;
+    c.innerHTML = `
+      <div class="label">Kartu ${i+1}</div>
+      <div class="badge">?</div>
+      <div class="prize"></div>
+    `;
+    c.addEventListener('click', onCardClick);
     gridWrap.appendChild(c);
   }
 }
 
-function setStatus(txt){status.textContent='Status: '+txt;}
+function setStatus(txt){status.textContent = 'Status: '+txt;}
 
-async function fetchConfig(){
+function fetchConfig(){
   setStatus('Memuat konfigurasi...');
   try{
     onValue(dbRef,(snap)=>{
@@ -85,33 +98,54 @@ async function fetchConfig(){
         serverConfig = snap.val();
         setStatus('Siap - data tersedia');
         if(!unlocked) buildGrid();
-      }else{setStatus('Belum ada konfigurasi');}
+      } else { setStatus('Belum ada konfigurasi'); }
     });
-  }catch(err){console.error(err);setStatus('Gagal: '+err.message);}
+  }catch(err){ console.error(err); setStatus('Gagal: '+err.message);}
 }
 
 function onCardClick(e){
-  const el=e.currentTarget;
-  const idx=Number(el.dataset.index);
+  const el = e.currentTarget;
+  const idx = Number(el.dataset.index);
   if(!unlocked || revealed.has(idx)) return;
-  const cards = serverConfig?.cards||[];
-  const value = cards[idx]||'Kosong';
+  if(revealed.size >= MAX_SELECTION){
+    setStatus('Kamu hanya bisa membuka 3 kartu.');
+    return;
+  }
+
+  const cards = serverConfig?.cards || [];
+  const value = cards[idx] || 'Kosong';
   el.classList.add('revealed');
-  el.querySelector('.label').textContent=value;
-  el.querySelector('.badge').textContent=value==='Platinum'?'P':value==='Diamond'?'D':value==='Super Diamond'?'S':'?';
+  el.querySelector('.label').textContent = value;
+  el.querySelector('.badge').textContent = value==='Platinum'?'P':value==='Diamond'?'D':value==='Super Diamond'?'S':'?';
+  el.querySelector('.prize').textContent = PRIZES[value] ? `Hadiah: ${PRIZES[value]}` : '';
   revealed.add(idx);
 
-  const msg=document.createElement('div');
-  msg.className='small';
-  msg.textContent=`Kamu membuka Kartu ${idx+1}: ${value}`;
+  if(revealed.size >= MAX_SELECTION){
+    document.querySelectorAll('.card').forEach(c=>{
+      if(!revealed.has(Number(c.dataset.index))) c.classList.add('locked');
+    });
+    setStatus('Kamu sudah membuka 3 kartu.');
+  }
+
+  const msg = document.createElement('div');
+  msg.className = 'small';
+  msg.textContent = `Kamu membuka Kartu ${idx+1}: ${value}`;
   resultArea.prepend(msg);
 }
 
-verifyBtn.addEventListener('click',()=>{
-  const code=(codeInput.value||'').trim();
-  if(!serverConfig){setStatus('Tidak ada konfigurasi');return;}
-  if(code===serverConfig.code){unlocked=true;setStatus('Kode benar');document.querySelectorAll('.card').forEach(c=>c.classList.remove('locked'));}
-  else{unlocked=false;setStatus('Kode salah');}
+verifyBtn.addEventListener('click', ()=>{
+  const code = (codeInput.value||'').trim();
+  if(!serverConfig){setStatus('Tidak ada konfigurasi'); return;}
+  if(code === serverConfig.code){
+    unlocked = true;
+    setStatus('Kode benar — kamu boleh menebak!');
+    document.querySelectorAll('.card').forEach(c=>{
+      if(!revealed.has(Number(c.dataset.index))) c.classList.remove('locked');
+    });
+  } else {
+    unlocked = false;
+    setStatus('Kode salah — coba lagi');
+  }
 });
 
 buildGrid();
