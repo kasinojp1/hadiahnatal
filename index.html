@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>User - Tebak Kartu</title>
+  <style>
+    :root{
+      --bg:#080808;
+      --panel:#0f1113;
+      --gold:#d4af37;
+      --card-bg:#0b0b0b;
+      --muted:#bfc6c9;
+    }
+    body{margin:0;font-family:Inter, Poppins, sans-serif;background:linear-gradient(180deg,#070707,#0c0c0c);color:#fff;min-height:100vh;
+      display:flex;align-items:center;justify-content:center;padding:20px;}
+    .wrap{width:100%;max-width:920px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));padding:20px;border-radius:12px;border:1px solid rgba(212,175,55,0.06)}
+    h1{margin:0 0 8px;color:var(--gold)}
+    p.lead{margin:0 0 18px;color:var(--muted)}
+    .code-row{display:flex;gap:10px;align-items:center;margin-bottom:18px}
+    input[type="text"]{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:#0b0f10;color:#fff}
+    .btn{background:linear-gradient(90deg,var(--gold), #f0d56a);color:#111;padding:10px 12px;border-radius:10px;border:none;font-weight:700;cursor:pointer}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .card{
+      height:140px;border-radius:10px;background:linear-gradient(180deg,#0b0b0b,#151515);border:1px solid rgba(212,175,55,0.06);
+      display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;
+      transition:transform .25s, box-shadow .25s;
+    }
+    .card:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(0,0,0,0.4)}
+    .card.locked{filter:grayscale(.2) blur(0.2px);cursor:not-allowed;opacity:.9}
+    .card .label{font-size:16px;color:var(--muted)}
+    .card.revealed{background:linear-gradient(180deg, rgba(212,175,55,0.08), rgba(212,175,55,0.02));color:#000}
+    .badge{
+      position:absolute;top:10px;right:10px;padding:6px 8px;border-radius:8px;background:rgba(0,0,0,0.4);font-weight:700;color:var(--gold)
+    }
+    .result-area{margin-top:16px}
+    .small{font-size:13px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Game Tebak Kartu</h1>
+    <p class="lead">Masukkan kode yang diberikan admin lalu tebak salah satu dari 9 kartu.</p>
+
+    <div class="code-row">
+      <input id="codeInput" placeholder="Masukkan kode akses..." />
+      <button id="verifyBtn" class="btn">Verify</button>
+      <div style="margin-left:auto" class="small" id="status">Status: belum terkoneksi</div>
+    </div>
+
+    <div id="gridWrap" class="grid" aria-live="polite" aria-atomic="true">
+      <!-- 9 kartu -->
+    </div>
+
+    <div class="result-area" id="resultArea"></div>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDzikWeuSIoMTCC6wsD64NnX5bLQQvM2dA",
+      authDomain: "ariptoto-93af7.firebaseapp.com",
+      projectId: "ariptoto-93af7",
+      storageBucket: "ariptoto-93af7.appspot.com",
+      messagingSenderId: "703805134804",
+      appId: "1:703805134804:web:402e7f9e378ae1ecdb2841"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const docRef = doc(db, "gameConfig", "cards");
+
+    // UI refs
+    const gridWrap = document.getElementById('gridWrap');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const codeInput = document.getElementById('codeInput');
+    const status = document.getElementById('status');
+    const resultArea = document.getElementById('resultArea');
+
+    let serverConfig = null;
+    let unlocked = false;
+    let revealed = new Set();
+
+    // build 9 placeholder cards
+    function buildGrid(){
+      gridWrap.innerHTML = '';
+      for(let i=0;i<9;i++){
+        const c = document.createElement('div');
+        c.className = 'card locked';
+        c.dataset.index = i;
+        c.innerHTML = `<div class="label">Kartu ${i+1}</div><div class="badge">?</div>`;
+        c.addEventListener('click', onCardClick);
+        gridWrap.appendChild(c);
+      }
+    }
+
+    function setStatus(txt){
+      status.textContent = 'Status: ' + txt;
+    }
+
+    async function fetchConfig(){
+      setStatus('memuat konfigurasi...');
+      try{
+        const snap = await getDoc(docRef);
+        if(snap.exists()){
+          serverConfig = snap.data();
+          setStatus('siap - data tersedia');
+          // live listen for updates
+          onSnapshot(docRef, (s)=>{
+            if(!s.exists()) return;
+            serverConfig = s.data();
+            setStatus('data diupdate oleh admin');
+            // if user already unlocked, no need to lock again; else reflect changes visually
+            if(!unlocked) buildGrid();
+          });
+        }else{
+          serverConfig = null;
+          setStatus('belum ada konfigurasi (tunggu admin)');
+        }
+      }catch(err){
+        console.error(err); setStatus('gagal memuat: '+err.message);
+      }
+    }
+
+    function onCardClick(e){
+      const el = e.currentTarget;
+      const idx = Number(el.dataset.index);
+      if(!unlocked){
+        // not allowed
+        return;
+      }
+      if(revealed.has(idx)) return; // sudah dibuka
+      // reveal according to serverConfig.cards
+      const cards = serverConfig && serverConfig.cards ? serverConfig.cards : null;
+      const value = (cards && cards[idx]) ? cards[idx] : 'Kosong';
+      el.classList.add('revealed');
+      el.querySelector('.label').textContent = value;
+      el.querySelector('.badge').textContent = value === 'Platinum' ? 'P' : (value === 'Diamond' ? 'D' : (value === 'Super Diamond' ? 'S' : '?'));
+      revealed.add(idx);
+
+      // optionally show small message
+      const msg = document.createElement('div');
+      msg.className = 'small';
+      msg.textContent = `Kamu membuka Kartu ${idx+1}: ${value}`;
+      resultArea.prepend(msg);
+    }
+
+    verifyBtn.addEventListener('click', ()=>{
+      const code = (codeInput.value || '').trim();
+      if(!serverConfig){
+        setStatus('tidak ada konfigurasi di server');
+        return;
+      }
+      if(code === (serverConfig.code || '')){
+        unlocked = true;
+        setStatus('kode benar — kamu boleh menebak!'); 
+        // enable cards visually
+        document.querySelectorAll('.card').forEach(c=>c.classList.remove('locked'));
+      }else{
+        unlocked = false;
+        setStatus('kode salah — coba lagi');
+      }
+    });
+
+    // init
+    buildGrid();
+    fetchConfig();
+  </script>
+</body>
+</html>
