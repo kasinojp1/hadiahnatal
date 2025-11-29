@@ -5,183 +5,50 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>User - Tebak Kartu Natal</title>
 <style>
-/* Font & body */
-body{
-  margin:0;
-  font-family:'Poppins',sans-serif;
-  background: linear-gradient(to bottom,#08121c,#0b1a2b);
-  color:#fff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:100vh;
-  padding:20px;
-  overflow:hidden;
-  position:relative;
-}
-
-/* Snowflakes */
-.snowflake{
-  position:absolute;
-  top:-10px;
-  color:#fff;
-  font-size:1em;
-  user-select:none;
-  pointer-events:none;
-  animation: snow linear infinite;
-}
-@keyframes snow{
-  0%{transform: translateY(-10px);}
-  100%{transform: translateY(110vh);}
-}
-
-/* Wrapper utama */
-.wrap{
-  width:100%;
-  max-width:920px;
-  background:#111;
-  padding:20px;
-  border-radius:12px;
-  border:1px solid rgba(212,175,55,0.1);
-  box-shadow:0 0 30px rgba(0,0,0,0.5);
-}
-
-/* Judul */
-h1{
-  color:#d4af37;
-  margin-bottom:10px;
-  text-align:center;
-}
-
-/* Row input kode */
-.code-row{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  margin-bottom:18px;
-  flex-wrap:wrap;
-}
-input{
-  padding:10px;
-  border-radius:8px;
-  border:none;
-  background:#0b0f10;
-  color:#fff;
-  flex:1;
-}
-.btn{
-  background:#d4af37;
-  color:#111;
-  padding:10px 12px;
-  border-radius:8px;
-  border:none;
-  cursor:pointer;
-  font-weight:600;
-}
-
-/* Daftar hadiah */
-.prize-list{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:12px;
-  justify-content:center;
-}
-.prize-item{
-  flex:1 1 30%;
-  background:#0b0b0b;
-  padding:12px;
-  border-radius:8px;
-  border:1px solid rgba(212,175,55,0.05);
-  text-align:center;
-  font-size:14px;
-  font-weight:600;
-  color:#d4af37;
-}
-
-/* Grid kartu */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-  margin-top:20px;
-}
-
-/* Kartu */
-.card{
-  height:140px;
-  border-radius:10px;
-  perspective:1000px;
-  cursor:pointer;
-  position:relative;
-}
+body{margin:0;font-family:'Poppins',sans-serif;background:linear-gradient(to bottom,#08121c,#0b1a2b);color:#fff;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;overflow:hidden;}
+.snowflake{position:absolute;top:-10px;color:#fff;font-size:1em;user-select:none;pointer-events:none;animation:snow linear infinite;}
+@keyframes snow{0%{transform:translateY(-10px);}100%{transform:translateY(110vh);}}
+.wrap{width:100%;max-width:920px;background:#111;padding:20px;border-radius:12px;border:1px solid rgba(212,175,55,0.1);box-shadow:0 0 30px rgba(0,0,0,0.5);}
+h1{color:#d4af37;margin-bottom:10px;text-align:center;}
+.code-row{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap;}
+input{padding:10px;border-radius:8px;border:none;background:#0b0f10;color:#fff;flex:1;}
+.btn{background:#d4af37;color:#111;padding:10px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600;}
+.prize-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;justify-content:center;}
+.prize-item{flex:1 1 30%;background:#0b0b0b;padding:12px;border-radius:8px;border:1px solid rgba(212,175,55,0.05);text-align:center;font-size:14px;font-weight:600;color:#d4af37;}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px;}
+.card{height:140px;border-radius:10px;perspective:1000px;cursor:pointer;position:relative;}
 .card.locked{filter:grayscale(.2) blur(.2px);cursor:not-allowed;}
-.card-inner{
-  position:relative;
-  width:100%;
-  height:100%;
-  transition: transform .6s;
-  transform-style: preserve-3d;
-  border-radius:10px;
-}
-.card.flip .card-inner{
-  transform: rotateY(180deg);
-}
-.card-front, .card-back{
-  position:absolute;
-  width:100%;
-  height:100%;
-  backface-visibility:hidden;
-  border-radius:10px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:600;
-}
-.card-front{
-  background:#0b0b0b;
-  border:1px solid rgba(212,175,55,0.05);
-  color:#bfc6c9;
-}
-.card-back{
-  background:rgba(212,175,55,0.1);
-  transform: rotateY(180deg);
-  color:#111;
-}
-.badge{
-  position:absolute;
-  top:6px;
-  right:6px;
-  background:rgba(0,0,0,0.4);
-  color:#d4af37;
-  padding:3px 6px;
-  border-radius:6px;
-  font-weight:700;
-  font-size:12px;
-}
-
-/* Hasil kartu */
-.result-area{
-  margin-top:16px;
-}
+.card-inner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d;border-radius:10px;}
+.card.flip .card-inner{transform:rotateY(180deg);}
+.card-front,.card-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:600;}
+.card-front{background:#0b0b0b;border:1px solid rgba(212,175,55,0.05);color:#bfc6c9;}
+.card-back{background:rgba(212,175,55,0.1);transform:rotateY(180deg);color:#111;}
+.badge{position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.4);color:#d4af37;padding:3px 6px;border-radius:6px;font-weight:700;font-size:12px;}
+.result-area{margin-top:16px;}
 .small{font-size:13px;color:#bfc6c9;text-align:center;}
+.confetti{
+  position:absolute;width:8px;height:8px;background:rgba(212,175,55,0.9);
+  pointer-events:none;animation:confetti-fall 1s linear forwards;
+}
+@keyframes confetti-fall{
+  0%{transform:translateY(0px) rotate(0deg);opacity:1;}
+  100%{transform:translateY(120px) rotate(360deg);opacity:0;}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
 <h1>Tebak Kartu Natal</h1>
 <div class="code-row">
-  <input id="codeInput" placeholder="Masukkan kode..."/>
-  <button id="verifyBtn" class="btn">Verify</button>
-  <div class="small" id="status">Status: belum terkoneksi</div>
+<input id="codeInput" placeholder="Masukkan kode..."/>
+<button id="verifyBtn" class="btn">Verify</button>
+<div class="small" id="status">Status: belum terkoneksi</div>
 </div>
-
 <div class="prize-list">
   <div class="prize-item">Platinum: 10,000</div>
   <div class="prize-item">Diamond: 25,000</div>
   <div class="prize-item">Super Diamond: 500,000</div>
 </div>
-
 <div id="gridWrap" class="grid"></div>
 <div class="result-area" id="resultArea"></div>
 </div>
@@ -190,7 +57,6 @@ input{
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
-// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDlpuf_uIlpmr2ybAqpJ2GTTRW-t86PGf0",
   authDomain: "hadiahnatal-a033b.firebaseapp.com",
@@ -219,7 +85,6 @@ let revealed=new Set();
 let maxSelect=3;
 let selectedCount=0;
 
-// Build grid kartu
 function buildGrid(){
   gridWrap.innerHTML='';
   for(let i=0;i<9;i++){
@@ -235,10 +100,8 @@ function buildGrid(){
   }
 }
 
-// Set status
 function setStatus(txt){status.textContent='Status: '+txt;}
 
-// Ambil config dari Firebase
 function fetchConfig(){
   onValue(dbRef,(snap)=>{
     if(snap.exists()){
@@ -249,44 +112,50 @@ function fetchConfig(){
   });
 }
 
-// Klik kartu
+function createConfetti(x,y){
+  for(let i=0;i<20;i++){
+    const conf=document.createElement('div');
+    conf.className='confetti';
+    conf.style.left=(x + (Math.random()*40-20))+'px';
+    conf.style.top=(y + (Math.random()*40-20))+'px';
+    conf.style.background=['#d4af37','#ff4d4d','#4caf50','#2196f3'][Math.floor(Math.random()*4)];
+    document.body.appendChild(conf);
+    setTimeout(()=>conf.remove(),1000);
+  }
+}
+
 async function onCardClick(e){
   if(selectedCount>=maxSelect) return;
   const el = e.currentTarget;
   const idx = Number(el.dataset.index);
   if(!unlocked || revealed.has(idx)) return;
-
   const cards = serverConfig?.cards||[];
   const value = cards[idx]||'Kosong';
-
   el.classList.add('flip');
   el.querySelector('.label').textContent = value;
   revealed.add(idx);
   selectedCount++;
-
   const msg = document.createElement('div');
   msg.className = 'small';
   msg.textContent = `Kamu membuka Kartu ${idx+1}: ${value}`;
   resultArea.prepend(msg);
-
-  if(selectedCount>=maxSelect){
-    saveUsedCode();
+  if(['Platinum','Diamond','Super Diamond'].includes(value)){
+    const rect = el.getBoundingClientRect();
+    createConfetti(rect.left + rect.width/2, rect.top + rect.height/2);
   }
+  if(selectedCount>=maxSelect){ saveUsedCode(); }
 }
 
-// Simpan kode & kartu digunakan
 async function saveUsedCode(){
   const code = codeInput.value.trim();
   if(!code || !serverConfig) return;
   const snap = await get(ref(db, "gameConfig/usedCodes/"+code));
   if(snap.exists()){ setStatus("Kode sudah dipakai"); return; }
-
   const cardsArr = Array.from(gridWrap.querySelectorAll('.card')).map(c=>c.classList.contains('flip')?c.querySelector('.label').textContent:null);
   await set(ref(db,"gameConfig/usedCodes/"+code), {cards:cardsArr, time:Date.now()});
   setStatus("Kode & kartu tersimpan ✓");
 }
 
-// Verifikasi kode
 verifyBtn.addEventListener('click',()=>{
   const code = codeInput.value.trim();
   if(!serverConfig){setStatus('Tidak ada konfigurasi'); return;}
@@ -300,11 +169,10 @@ verifyBtn.addEventListener('click',()=>{
   }
 });
 
-// Build grid dan fetch config
 buildGrid();
 fetchConfig();
 
-// Snowflake generator
+// Snowflake Natal
 for(let i=0;i<50;i++){
   const snow = document.createElement('div');
   snow.className='snowflake';
