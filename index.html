@@ -3,65 +3,108 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Admin - Set Kartu & Histori</title>
+<title>User - Tebak Kartu</title>
 <style>
-body{margin:0;font-family:Inter,Poppins,sans-serif;background:#0b0b0b;color:#eee;display:flex;justify-content:center;padding:20px;}
-.panel{width:100%;max-width:1000px;background:#111;padding:20px;border-radius:12px;border:1px solid rgba(212,175,55,0.1);}
+body{
+  margin:0;
+  font-family:Inter,Poppins,sans-serif;
+  background:#080808;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  padding:20px;
+}
+.wrap{
+  width:100%;
+  max-width:920px;
+  background:#111;
+  padding:20px;
+  border-radius:12px;
+  border:1px solid rgba(212,175,55,0.1);
+}
 h1{color:#d4af37;margin-bottom:10px;}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px;}
-.card-editor{padding:10px;border-radius:10px;background:#0f1113;border:1px solid rgba(212,175,55,0.05);}
-select{width:100%;padding:8px;border-radius:8px;background:#0b1114;color:#fff;border:none;}
-.btn{background:#d4af37;color:#111;padding:10px 12px;border-radius:8px;border:none;cursor:pointer;margin-right:8px;}
-.status{margin-top:12px;color:#9aa0a6;}
-table{width:100%;border-collapse:collapse;margin-top:20px;}
-th,td{border:1px solid rgba(212,175,55,0.1);padding:8px;text-align:center;}
-th{background:#0f1113;color:#d4af37;}
-td{background:#0b0b0b;}
-.cards-list{font-size:13px;color:#bfc6c9;}
+.code-row{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap;}
+input{padding:10px;border-radius:8px;border:none;background:#0b0f10;color:#fff;flex:1;}
+.btn{background:#d4af37;color:#111;padding:10px 12px;border-radius:8px;border:none;cursor:pointer;}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  perspective:1000px;
+}
+.card{
+  height:140px;
+  border-radius:10px;
+  background:#0b0b0b;
+  border:1px solid rgba(212,175,55,0.05);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  position:relative;
+  transition:transform .5s;
+  transform-style: preserve-3d;
+}
+.card.flipped{
+  transform: rotateY(180deg);
+}
+.card.locked{filter:grayscale(.2) blur(.2px);cursor:not-allowed;}
+.card .front,.card .back{
+  position:absolute;
+  width:100%;
+  height:100%;
+  backface-visibility:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+}
+.card .front{background:#0b0b0b;color:#bfc6c9;}
+.card .back{background:rgba(212,175,55,0.1);color:#111;transform:rotateY(180deg);}
+.badge{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.4);color:#d4af37;padding:4px 6px;border-radius:6px;font-weight:700;}
+.result-area{margin-top:16px;}
+.small{font-size:13px;color:#bfc6c9;}
+.prize-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:12px;
+}
+.prize-item{
+  flex:1 1 30%;
+  background:#0b0b0b;
+  padding:8px;
+  border-radius:8px;
+  border:1px solid rgba(212,175,55,0.05);
+  text-align:center;
+  font-size:14px;
+}
 </style>
 </head>
 <body>
-<div class="panel">
-<h1>Admin Panel - Set Kartu & Histori</h1>
-
-<label>Kode Akses Admin:</label>
-<input type="text" id="codeInput" value="1234"/>
-
-<div class="grid" id="editGrid"></div>
-
-<div style="margin-top:10px;">
-<button id="saveBtn" class="btn">Save</button>
-<button id="refreshBtn" class="btn">Refresh</button>
+<div class="wrap">
+<h1>Tebak Kartu</h1>
+<div class="code-row">
+<input id="codeInput" placeholder="Masukkan kode..."/>
+<button id="verifyBtn" class="btn">Verify</button>
+<div class="small" id="status">Status: belum terkoneksi</div>
 </div>
-<div class="status" id="status">Status: Idle</div>
 
-<h2 style="margin-top:30px;color:#d4af37;">Histori Kode User</h2>
-<table>
-  <thead>
-    <tr>
-      <th>Kode</th>
-      <th>Kartu 1</th>
-      <th>Kartu 2</th>
-      <th>Kartu 3</th>
-      <th>Kartu 4</th>
-      <th>Kartu 5</th>
-      <th>Kartu 6</th>
-      <th>Kartu 7</th>
-      <th>Kartu 8</th>
-      <th>Kartu 9</th>
-      <th>Waktu Digunakan</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-  <tbody id="historyBody">
-    <!-- data realtime dari Firebase -->
-  </tbody>
-</table>
+<div class="prize-list">
+  <div class="prize-item">Platinum: 10,000</div>
+  <div class="prize-item">Diamond: 25,000</div>
+  <div class="prize-item">Super Diamond: 500,000</div>
+</div>
+
+<div id="gridWrap" class="grid"></div>
+<div class="result-area" id="resultArea"></div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDlpuf_uIlpmr2ybAqpJ2GTTRW-t86PGf0",
@@ -79,96 +122,110 @@ const db = getDatabase(app);
 const dbRef = ref(db, "gameConfig/cards");
 const usedRef = ref(db, "gameConfig/usedCodes");
 
-const editGrid = document.getElementById('editGrid');
-const codeInput = document.getElementById('codeInput');
-const saveBtn = document.getElementById('saveBtn');
-const refreshBtn = document.getElementById('refreshBtn');
-const status = document.getElementById('status');
-const historyBody = document.getElementById('historyBody');
+const gridWrap=document.getElementById('gridWrap');
+const verifyBtn=document.getElementById('verifyBtn');
+const codeInput=document.getElementById('codeInput');
+const status=document.getElementById('status');
+const resultArea=document.getElementById('resultArea');
 
-const OPTIONS = ["Platinum","Diamond","Super Diamond"];
+let serverConfig=null;
+let unlocked=false;
+let revealed=new Set();
+const maxSelect=3;
+let selectedCount=0;
 
 function buildGrid(){
-  editGrid.innerHTML="";
+  gridWrap.innerHTML='';
   for(let i=0;i<9;i++){
-    const wrap=document.createElement("div");
-    wrap.className="card-editor";
-    wrap.innerHTML=`<div>Kartu ${i+1}</div>
-    <select data-index="${i}">${OPTIONS.map(o=>`<option value="${o}">${o}</option>`).join('')}</select>`;
-    editGrid.appendChild(wrap);
+    const c=document.createElement('div');
+    c.className='card locked';
+    c.dataset.index=i;
+    c.innerHTML=`
+      <div class="front">Kartu ${i+1}</div>
+      <div class="back">?</div>
+    `;
+    c.addEventListener('click',onCardClick);
+    gridWrap.appendChild(c);
   }
 }
 
-function setStatus(txt,ok=true){
-  status.textContent="Status: "+txt;
-  status.style.color = ok?"#9aa0a6":"#ff6b6b";
+function setStatus(txt){
+  status.textContent='Status: '+txt;
 }
 
-async function saveToFirebase(){
-  setStatus("Menyimpan...");
-  const cards = Array.from(editGrid.querySelectorAll("select")).map(s=>s.value);
-  const code = codeInput.value || "1234";
-  try{
-    await set(dbRef,{code,cards});
-    setStatus("Tersimpan ✓");
-  }catch(err){console.error(err); setStatus("Gagal: "+err.message,false);}
+onValue(dbRef,(snap)=>{
+  if(snap.exists()){
+    serverConfig = snap.val();
+    setStatus('Siap - data tersedia');
+    if(!unlocked) buildGrid();
+  } else {
+    setStatus('Belum ada konfigurasi');
+  }
+});
+
+function onCardClick(e){
+  if(selectedCount>=maxSelect) return;
+  const el=e.currentTarget;
+  const idx=Number(el.dataset.index);
+  if(!unlocked || revealed.has(idx)) return;
+
+  const cards = serverConfig?.cards||[];
+  const value = cards[idx] || 'Kosong';
+
+  el.classList.add('flipped');
+  el.querySelector('.back').textContent = value;
+  revealed.add(idx);
+  selectedCount++;
+
+  const msg=document.createElement('div');
+  msg.className='small';
+  msg.textContent=`Kamu membuka Kartu ${idx+1}: ${value}`;
+  resultArea.prepend(msg);
+
+  // Simpan ke usedCodes jika sudah pilih max
+  if(selectedCount>=maxSelect){
+    saveUsedCode();
+  }
 }
 
-async function loadFromFirebase(){
-  setStatus("Memuat...");
-  try{
-    const snap = await get(dbRef);
-    if(snap.exists()){
-      const data = snap.val();
-      codeInput.value = data.code||"1234";
-      const cards = data.cards||[];
-      Array.from(editGrid.querySelectorAll("select")).forEach((s,i)=>{
-        if(cards[i]) s.value = cards[i];
-      });
-      setStatus("Data dimuat ✓");
-    }else{setStatus("Belum ada data");}
-  }catch(err){console.error(err); setStatus("Gagal: "+err.message,false);}
-}
-
-// realtime update histori
-function loadHistory(){
-  historyBody.innerHTML="";
-  onValue(usedRef,(snap)=>{
-    if(snap.exists()){
-      const data = snap.val();
-      const arr = Object.entries(data).sort((a,b)=>{
-        return new Date(b[1].createdAt) - new Date(a[1].createdAt);
-      });
-      historyBody.innerHTML="";
-      for(const [code,obj] of arr){
-        const tr = document.createElement("tr");
-        const tdCode = document.createElement("td"); tdCode.textContent = code; tr.appendChild(tdCode);
-        const cardsArr = obj.cards || [];
-        for(let i=0;i<9;i++){
-          const td = document.createElement("td");
-          td.textContent = cardsArr[i] || "-";
-          tr.appendChild(td);
-        }
-        const tdTime = document.createElement("td");
-        tdTime.textContent = obj.createdAt ? new Date(obj.createdAt).toLocaleString() : "-";
-        tr.appendChild(tdTime);
-        const tdStatus = document.createElement("td");
-        tdStatus.textContent = obj.used ? "Sudah digunakan" : "Belum digunakan";
-        tr.appendChild(tdStatus);
-        historyBody.appendChild(tr);
-      }
-    } else {
-      historyBody.innerHTML="<tr><td colspan='12'>Belum ada histori</td></tr>";
-    }
+async function saveUsedCode(){
+  if(!serverConfig) return;
+  const code = codeInput.value.trim();
+  const cards = Array.from(gridWrap.querySelectorAll('.card')).map(c=>{
+    return c.classList.contains('flipped') ? c.querySelector('.back').textContent : null;
   });
+  try{
+    const snap = await get(ref(db, "gameConfig/usedCodes/"+code));
+    if(snap.exists()){
+      setStatus("Kode sudah pernah dipakai");
+      return;
+    }
+    await set(ref(db, "gameConfig/usedCodes/"+code), {
+      cards,
+      createdAt: Date.now(),
+      used: true
+    });
+    setStatus("Kode & kartu tersimpan di histori ✓");
+  }catch(err){
+    console.error(err);
+    setStatus("Gagal menyimpan: "+err.message);
+  }
 }
+
+verifyBtn.addEventListener('click',()=>{
+  const code = (codeInput.value||'').trim();
+  if(!serverConfig){setStatus('Tidak ada konfigurasi');return;}
+  if(code===serverConfig.code){
+    unlocked=true;
+    setStatus('Kode benar — pilih kartu!');
+    document.querySelectorAll('.card').forEach(c=>c.classList.remove('locked'));
+  } else {
+    unlocked=false;
+    setStatus('Kode salah');
+  }
+});
 
 buildGrid();
-loadFromFirebase();
-loadHistory();
-
-saveBtn.addEventListener("click",saveToFirebase);
-refreshBtn.addEventListener("click",loadFromFirebase);
 </script>
 </body>
 </html>
