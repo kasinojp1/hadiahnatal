@@ -3,33 +3,196 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>User - Tebak Kartu</title>
+<title>User - Tebak Kartu Natal</title>
 <style>
-body{margin:0;font-family:Inter,Poppins,sans-serif;background:#080808;color:#fff;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;}
-.wrap{width:100%;max-width:920px;background:#111;padding:20px;border-radius:12px;border:1px solid rgba(212,175,55,0.1);}
-h1{color:#d4af37;margin-bottom:10px;}
-.code-row{display:flex;gap:10px;align-items:center;margin-bottom:18px;}
-input{padding:10px;border-radius:8px;border:none;background:#0b0f10;color:#fff;}
-.btn{background:#d4af37;color:#111;padding:10px 12px;border-radius:8px;border:none;cursor:pointer;}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-.card{height:140px;border-radius:10px;background:#0b0b0b;border:1px solid rgba(212,175,55,0.05);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:transform .5s, transform-style .5s; transform-style: preserve-3d;}
-.card.flip{transform: rotateY(180deg);}
-.card.locked{filter:grayscale(.2) blur(.2px);cursor:not-allowed;}
-.card .front, .card .back{position:absolute;width:100%;height:100%;display:flex;align-items:center;justify-content:center;border-radius:10px;backface-visibility:hidden;}
-.card .back{background:rgba(212,175,55,0.1);transform:rotateY(180deg);}
-.card .front{background:#0b0b0b;color:#bfc6c9;}
-.badge{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.4);color:#d4af37;padding:4px 6px;border-radius:6px;font-weight:700;}
-.result-area{margin-top:16px;}
-.small{font-size:13px;color:#bfc6c9;}
-.prize-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
-.prize-item{flex:1 1 30%;background:#0b0b0b;padding:8px;border-radius:8px;border:1px solid rgba(212,175,55,0.05);text-align:center;font-size:14px;}
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:#08121c url('https://i.ibb.co/6YpYQZT/snow-bg.png') repeat;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  padding:20px;
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* Salju animasi */
+@keyframes snow{
+  0%{transform: translateY(0);}
+  100%{transform: translateY(100vh);}
+}
+.snowflake{
+  position:absolute;
+  top:-10px;
+  font-size:1em;
+  color:#fff;
+  animation: snow linear infinite;
+  pointer-events:none;
+}
+
+.wrap{
+  width:100%;
+  max-width:920px;
+  background:linear-gradient(145deg,#111 0%,#1c1c2b 100%);
+  padding:20px;
+  border-radius:20px;
+  border:2px solid #d4af37;
+  box-shadow:0 0 30px rgba(212,175,55,0.5);
+}
+
+h1{
+  color:#d4af37;
+  margin-bottom:15px;
+  text-align:center;
+  text-shadow: 0 0 10px #d4af37;
+}
+
+.code-row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:20px;
+}
+
+input{
+  padding:12px;
+  border-radius:12px;
+  border:none;
+  background:#0b0f10;
+  color:#fff;
+  width:200px;
+  text-align:center;
+  font-weight:600;
+}
+
+.btn{
+  background:#d4af37;
+  color:#111;
+  padding:12px 20px;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  font-weight:600;
+  transition:0.3s;
+}
+.btn:hover{
+  transform: scale(1.05);
+  box-shadow:0 0 20px #d4af37;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+
+.card{
+  height:160px;
+  border-radius:15px;
+  background:#0b0b0b;
+  border:2px solid #d4af37;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  position:relative;
+  transition: transform .6s;
+  transform-style: preserve-3d;
+  box-shadow:0 0 15px rgba(212,175,55,0.2);
+}
+
+.card.flip{
+  transform: rotateY(180deg);
+}
+
+.card.locked{
+  filter:grayscale(.2) blur(.5px);
+  cursor:not-allowed;
+}
+
+.card .front, .card .back{
+  position:absolute;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:15px;
+  backface-visibility:hidden;
+  font-size:18px;
+  font-weight:700;
+}
+
+.card .front{
+  background:#0b0b0b;
+  color:#fff;
+}
+
+.card .back{
+  background:linear-gradient(135deg,#d61c1c,#1cd670);
+  color:#fff;
+  transform:rotateY(180deg);
+  display:flex;
+  flex-direction:column;
+}
+
+.badge{
+  position:absolute;
+  top:10px;
+  right:10px;
+  background:rgba(0,0,0,0.4);
+  color:#fff;
+  padding:4px 6px;
+  border-radius:6px;
+  font-weight:700;
+}
+
+.result-area{
+  margin-top:20px;
+  max-height:200px;
+  overflow-y:auto;
+  font-size:14px;
+}
+
+.small{
+  font-size:13px;
+  color:#bfc6c9;
+}
+
+.prize-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:20px;
+  justify-content:center;
+}
+
+.prize-item{
+  flex:1 1 28%;
+  background:linear-gradient(135deg,#d61c1c,#1cd670);
+  padding:12px;
+  border-radius:12px;
+  text-align:center;
+  font-size:16px;
+  font-weight:600;
+  color:#fff;
+  box-shadow:0 0 15px rgba(212,175,55,0.4);
+  transition:0.3s;
+}
+.prize-item:hover{
+  transform: scale(1.05);
+}
 </style>
 </head>
 <body>
 <div class="wrap">
-<h1>Tebak Kartu</h1>
+<h1>Tebak Kartu Natal 🎄</h1>
 <div class="code-row">
-<input id="codeInput" placeholder="Kode akses..."/>
+<input id="codeInput" placeholder="Masukkan kode..."/>
 <button id="verifyBtn" class="btn">Verify</button>
 <div class="small" id="status">Status: belum terkoneksi</div>
 </div>
@@ -94,7 +257,7 @@ function fetchConfig(){
   onValue(dbRef,(snap)=>{
     if(snap.exists()){
       serverConfig = snap.val();
-      setStatus('Siap - data tersedia');
+      setStatus('Siap - data tersedia 🎁');
       if(!unlocked) buildGrid();
     }else setStatus('Belum ada konfigurasi');
   });
@@ -127,17 +290,23 @@ async function saveUsedCode(){
   const code = codeInput.value.trim();
   if(!code || !serverConfig) return;
   const snap = await get(ref(db, "gameConfig/usedCodes/"+code));
-  if(snap.exists()){ setStatus("Kode sudah dipakai"); return; }
+  if(snap.exists()){ setStatus("Kode sudah dipakai ❌"); return; }
   const cardsArr = Array.from(gridWrap.querySelectorAll('.card')).map(c=>c.classList.contains('flip')?c.querySelector('.label').textContent:null);
   await set(ref(db,"gameConfig/usedCodes/"+code), {cards:cardsArr, time:Date.now()});
-  setStatus("Kode & kartu tersimpan ✓");
+  setStatus("Kode & kartu tersimpan 🎄");
 }
 
 verifyBtn.addEventListener('click',()=>{
   const code = codeInput.value.trim();
   if(!serverConfig){setStatus('Tidak ada konfigurasi'); return;}
-  if(code===serverConfig.code){unlocked=true; setStatus('Kode benar — pilih kartu!'); document.querySelectorAll('.card').forEach(c=>c.classList.remove('locked'));}
-  else{unlocked=false; setStatus('Kode salah');}
+  if(code===serverConfig.code){
+    unlocked=true; 
+    setStatus('Kode benar — pilih kartu! 🎁'); 
+    document.querySelectorAll('.card').forEach(c=>c.classList.remove('locked'));
+  } else{
+    unlocked=false; 
+    setStatus('Kode salah ❌');
+  }
 });
 
 buildGrid();
