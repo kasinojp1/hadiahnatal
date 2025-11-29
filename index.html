@@ -12,13 +12,13 @@ h1{color:#d4af37;margin:0 0 8px;}
 input{padding:10px;border-radius:8px;border:none;background:#0b0f10;color:#fff;}
 .btn{background:#d4af37;color:#111;padding:10px 12px;border-radius:8px;border:none;cursor:pointer;}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-.card{height:140px;border-radius:10px;background:#0b0b0b;border:1px solid rgba(212,175,55,0.05);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:transform .25s;}
-.card:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(0,0,0,0.4);}
-.card.locked{filter:grayscale(.2) blur(.2px);cursor:not-allowed;}
-.card.revealed{background:rgba(212,175,55,0.1);}
-.card .label{color:#bfc6c9;text-align:center;}
-.card .prize{position:absolute;bottom:10px;width:100%;text-align:center;font-size:14px;color:#d4af37;font-weight:700;}
-.badge{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.4);color:#d4af37;padding:4px 6px;border-radius:6px;font-weight:700;}
+.card{height:140px;border-radius:10px;background:#0b0b0b;border:1px solid rgba(212,175,55,0.05);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;perspective:1000px;}
+.card-inner{width:100%;height:100%;transition:transform 0.6s;transform-style:preserve-3d;position:relative;}
+.card.revealed .card-inner{transform:rotateY(180deg);}
+.card-front, .card-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;border-radius:10px;}
+.card-front{background:#0b0b0b;color:#bfc6c9;flex-direction:column;}
+.card-back{background:#d4af37;color:#111;transform:rotateY(180deg);flex-direction:column;}
+.badge{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.4);color:#111;padding:4px 6px;border-radius:6px;font-weight:700;}
 .result-area{margin-top:16px;}
 .small{font-size:13px;color:#bfc6c9;}
 </style>
@@ -37,7 +37,7 @@ input{padding:10px;border-radius:8px;border:none;background:#0b0f10;color:#fff;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+import { getDatabase, ref, onValue, get, child, update } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDlpuf_uIlpmr2ybAqpJ2GTTRW-t86PGf0",
@@ -52,7 +52,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const dbRef = ref(db,"gameConfig/cards");
+const cardsRef = ref(db,"gameConfig/cards");
+const codesRef = ref(db,"gameConfig/usedCodes");
 
 const gridWrap = document.getElementById('gridWrap');
 const verifyBtn = document.getElementById('verifyBtn');
@@ -60,96 +61,107 @@ const codeInput = document.getElementById('codeInput');
 const status = document.getElementById('status');
 const resultArea = document.getElementById('resultArea');
 
-let serverConfig = null;
+let serverCards = [];
 let unlocked = false;
 let revealed = new Set();
 const MAX_SELECTION = 3;
 
-// Hadiah kartu
 const PRIZES = {
   'Platinum':'10,000',
   'Diamond':'25,000',
   'Super Diamond':'500,000'
 };
 
-function buildGrid(){
-  gridWrap.innerHTML = '';
+function buildGrid(cards){
+  gridWrap.innerHTML='';
   for(let i=0;i<9;i++){
+    const cardType = cards[i] || 'Kosong';
     const c = document.createElement('div');
-    c.className = 'card locked';
-    c.dataset.index = i;
-    c.innerHTML = `
-      <div class="label">Kartu ${i+1}</div>
-      <div class="badge">?</div>
-      <div class="prize"></div>
+    c.className='card locked';
+    c.dataset.index=i;
+    c.innerHTML=`
+      <div class="card-inner">
+        <div class="card-front">
+          <div class="label">Kartu ${i+1}</div>
+          <div class="badge">?</div>
+        </div>
+        <div class="card-back">
+          <div class="label">${cardType}</div>
+          <div class="prize">Hadiah: ${PRIZES[cardType] || '-'}</div>
+        </div>
+      </div>
     `;
-    c.addEventListener('click', onCardClick);
+    c.addEventListener('click',onCardClick);
     gridWrap.appendChild(c);
   }
 }
 
-function setStatus(txt){status.textContent = 'Status: '+txt;}
+function setStatus(txt){status.textContent='Status: '+txt;}
 
-function fetchConfig(){
-  setStatus('Memuat konfigurasi...');
-  try{
-    onValue(dbRef,(snap)=>{
-      if(snap.exists()){
-        serverConfig = snap.val();
-        setStatus('Siap - data tersedia');
-        if(!unlocked) buildGrid();
-      } else { setStatus('Belum ada konfigurasi'); }
-    });
-  }catch(err){ console.error(err); setStatus('Gagal: '+err.message);}
+async function fetchCards(){
+  setStatus('Memuat kartu...');
+  onValue(cardsRef,(snap)=>{
+    if(snap.exists()){
+      serverCards = snap.val().cards || [];
+      buildGrid(serverCards);
+      setStatus('Kartu siap');
+    } else {
+      setStatus('Belum ada konfigurasi kartu');
+    }
+  });
 }
 
-function onCardClick(e){
+async function onCardClick(e){
   const el = e.currentTarget;
   const idx = Number(el.dataset.index);
   if(!unlocked || revealed.has(idx)) return;
   if(revealed.size >= MAX_SELECTION){
-    setStatus('Kamu hanya bisa membuka 3 kartu.');
+    setStatus('Kamu hanya bisa membuka 3 kartu');
     return;
   }
 
-  const cards = serverConfig?.cards || [];
-  const value = cards[idx] || 'Kosong';
   el.classList.add('revealed');
-  el.querySelector('.label').textContent = value;
-  el.querySelector('.badge').textContent = value==='Platinum'?'P':value==='Diamond'?'D':value==='Super Diamond'?'S':'?';
-  el.querySelector('.prize').textContent = PRIZES[value] ? `Hadiah: ${PRIZES[value]}` : '';
   revealed.add(idx);
 
   if(revealed.size >= MAX_SELECTION){
     document.querySelectorAll('.card').forEach(c=>{
       if(!revealed.has(Number(c.dataset.index))) c.classList.add('locked');
     });
-    setStatus('Kamu sudah membuka 3 kartu.');
+    setStatus('Kamu sudah membuka 3 kartu');
   }
 
+  const cardType = serverCards[idx] || 'Kosong';
   const msg = document.createElement('div');
-  msg.className = 'small';
-  msg.textContent = `Kamu membuka Kartu ${idx+1}: ${value}`;
+  msg.className='small';
+  msg.textContent=`Kamu membuka Kartu ${idx+1}: ${cardType} - Hadiah: ${PRIZES[cardType]||'-'}`;
   resultArea.prepend(msg);
 }
 
-verifyBtn.addEventListener('click', ()=>{
+// verifikasi kode sekali pakai
+verifyBtn.addEventListener('click', async ()=>{
   const code = (codeInput.value||'').trim();
-  if(!serverConfig){setStatus('Tidak ada konfigurasi'); return;}
-  if(code === serverConfig.code){
-    unlocked = true;
-    setStatus('Kode benar — kamu boleh menebak!');
-    document.querySelectorAll('.card').forEach(c=>{
-      if(!revealed.has(Number(c.dataset.index))) c.classList.remove('locked');
-    });
-  } else {
-    unlocked = false;
-    setStatus('Kode salah — coba lagi');
+  if(!code){setStatus('Masukkan kode!'); return;}
+
+  const snap = await get(child(ref(db), "gameConfig/usedCodes"));
+  const usedCodes = snap.exists() ? snap.val() : {};
+
+  if(usedCodes[code]){
+    setStatus('Kode sudah digunakan, tidak bisa dipakai lagi');
+    return;
   }
+
+  // kode valid
+  unlocked = true;
+  setStatus('Kode benar — kamu bisa membuka kartu!');
+  document.querySelectorAll('.card').forEach(c=>c.classList.remove('locked'));
+
+  // tandai kode sebagai digunakan
+  const updateObj = {};
+  updateObj[code]=true;
+  update(ref(db, "gameConfig/usedCodes"), updateObj);
 });
 
-buildGrid();
-fetchConfig();
+fetchCards();
 </script>
 </body>
 </html>
