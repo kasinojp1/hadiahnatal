@@ -1,11 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>User - Tebak Kartu</title>
 <style>
-body{margin:0;font-family:Inter,Poppins,sans-serif;background:#080808;color:#fff;display:flex;justify-content:center;align-items:center;padding:20px;min-height:100vh;}
+body{margin:0;font-family:Inter,Poppins,sans-serif;background:#080808;color:#fff;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;}
 .wrap{width:100%;max-width:920px;background:#111;padding:20px;border-radius:12px;border:1px solid rgba(212,175,55,0.1);}
 h1{color:#d4af37;margin:0 0 8px;}
 .code-row{display:flex;gap:10px;align-items:center;margin-bottom:18px;}
@@ -36,20 +36,22 @@ input{padding:10px;border-radius:8px;border:none;background:#0b0f10;color:#fff;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import { getDatabase, ref, get, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
 const firebaseConfig = {
-apiKey: "AIzaSyDzikWeuSIoMTCC6wsD64NnX5bLQQvM2dA",
-authDomain: "ariptoto-93af7.firebaseapp.com",
-projectId: "ariptoto-93af7",
-storageBucket: "ariptoto-93af7.appspot.com",
-messagingSenderId: "703805134804",
-appId: "1:703805134804:web:402e7f9e378ae1ecdb2841"
+apiKey: "AIzaSyDlpuf_uIlpmr2ybAqpJ2GTTRW-t86PGf0",
+authDomain: "hadiahnatal-a033b.firebaseapp.com",
+databaseURL: "https://hadiahnatal-a033b-default-rtdb.firebaseio.com",
+projectId: "hadiahnatal-a033b",
+storageBucket: "hadiahnatal-a033b.firebasestorage.app",
+messagingSenderId: "577153304596",
+appId: "1:577153304596:web:5f255e886a379ccb12bf01",
+measurementId: "G-C5Q83YQ6SK"
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const docRef = doc(db,"gameConfig","cards");
+const db = getDatabase(app);
+const dbRef = ref(db,"gameConfig/cards");
 
 const gridWrap=document.getElementById('gridWrap');
 const verifyBtn=document.getElementById('verifyBtn');
@@ -78,17 +80,13 @@ function setStatus(txt){status.textContent='Status: '+txt;}
 async function fetchConfig(){
   setStatus('Memuat konfigurasi...');
   try{
-    const snap=await getDoc(docRef);
-    if(snap.exists()){
-      serverConfig=snap.data();
-      setStatus('Siap - data tersedia');
-      onSnapshot(docRef,s=>{
-        if(!s.exists()) return;
-        serverConfig=s.data();
-        setStatus('Data diupdate oleh admin');
+    onValue(dbRef,(snap)=>{
+      if(snap.exists()){
+        serverConfig = snap.val();
+        setStatus('Siap - data tersedia');
         if(!unlocked) buildGrid();
-      });
-    }else{setStatus('Belum ada data.');}
+      }else{setStatus('Belum ada konfigurasi');}
+    });
   }catch(err){console.error(err);setStatus('Gagal: '+err.message);}
 }
 
@@ -96,8 +94,8 @@ function onCardClick(e){
   const el=e.currentTarget;
   const idx=Number(el.dataset.index);
   if(!unlocked || revealed.has(idx)) return;
-  const cards=serverConfig?.cards||[];
-  const value=cards[idx]||'Kosong';
+  const cards = serverConfig?.cards||[];
+  const value = cards[idx]||'Kosong';
   el.classList.add('revealed');
   el.querySelector('.label').textContent=value;
   el.querySelector('.badge').textContent=value==='Platinum'?'P':value==='Diamond'?'D':value==='Super Diamond'?'S':'?';
