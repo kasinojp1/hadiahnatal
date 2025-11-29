@@ -5,89 +5,31 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>User - Tebak Kartu</title>
 <style>
-body{
-  margin:0;
-  font-family:Inter,Poppins,sans-serif;
-  background:#080808;
-  color:#fff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:100vh;
-  padding:20px;
-}
-.wrap{
-  width:100%;
-  max-width:920px;
-  background:#111;
-  padding:20px;
-  border-radius:12px;
-  border:1px solid rgba(212,175,55,0.1);
-}
+body{margin:0;font-family:Inter,Poppins,sans-serif;background:#080808;color:#fff;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;}
+.wrap{width:100%;max-width:920px;background:#111;padding:20px;border-radius:12px;border:1px solid rgba(212,175,55,0.1);}
 h1{color:#d4af37;margin-bottom:10px;}
-.code-row{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap;}
-input{padding:10px;border-radius:8px;border:none;background:#0b0f10;color:#fff;flex:1;}
+.code-row{display:flex;gap:10px;align-items:center;margin-bottom:18px;}
+input{padding:10px;border-radius:8px;border:none;background:#0b0f10;color:#fff;}
 .btn{background:#d4af37;color:#111;padding:10px 12px;border-radius:8px;border:none;cursor:pointer;}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-  perspective:1000px;
-}
-.card{
-  height:140px;
-  border-radius:10px;
-  background:#0b0b0b;
-  border:1px solid rgba(212,175,55,0.05);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  position:relative;
-  transition:transform .5s;
-  transform-style: preserve-3d;
-}
-.card.flipped{
-  transform: rotateY(180deg);
-}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.card{height:140px;border-radius:10px;background:#0b0b0b;border:1px solid rgba(212,175,55,0.05);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:transform .5s, transform-style .5s; transform-style: preserve-3d;}
+.card.flip{transform: rotateY(180deg);}
 .card.locked{filter:grayscale(.2) blur(.2px);cursor:not-allowed;}
-.card .front,.card .back{
-  position:absolute;
-  width:100%;
-  height:100%;
-  backface-visibility:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:10px;
-}
+.card .front, .card .back{position:absolute;width:100%;height:100%;display:flex;align-items:center;justify-content:center;border-radius:10px;backface-visibility:hidden;}
+.card .back{background:rgba(212,175,55,0.1);transform:rotateY(180deg);}
 .card .front{background:#0b0b0b;color:#bfc6c9;}
-.card .back{background:rgba(212,175,55,0.1);color:#111;transform:rotateY(180deg);}
 .badge{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.4);color:#d4af37;padding:4px 6px;border-radius:6px;font-weight:700;}
 .result-area{margin-top:16px;}
 .small{font-size:13px;color:#bfc6c9;}
-.prize-list{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-bottom:12px;
-}
-.prize-item{
-  flex:1 1 30%;
-  background:#0b0b0b;
-  padding:8px;
-  border-radius:8px;
-  border:1px solid rgba(212,175,55,0.05);
-  text-align:center;
-  font-size:14px;
-}
+.prize-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.prize-item{flex:1 1 30%;background:#0b0b0b;padding:8px;border-radius:8px;border:1px solid rgba(212,175,55,0.05);text-align:center;font-size:14px;}
 </style>
 </head>
 <body>
 <div class="wrap">
 <h1>Tebak Kartu</h1>
 <div class="code-row">
-<input id="codeInput" placeholder="Masukkan kode..."/>
+<input id="codeInput" placeholder="Kode akses..."/>
 <button id="verifyBtn" class="btn">Verify</button>
 <div class="small" id="status">Status: belum terkoneksi</div>
 </div>
@@ -131,7 +73,7 @@ const resultArea=document.getElementById('resultArea');
 let serverConfig=null;
 let unlocked=false;
 let revealed=new Set();
-const maxSelect=3;
+let maxSelect=3;
 let selectedCount=0;
 
 function buildGrid(){
@@ -140,92 +82,66 @@ function buildGrid(){
     const c=document.createElement('div');
     c.className='card locked';
     c.dataset.index=i;
-    c.innerHTML=`
-      <div class="front">Kartu ${i+1}</div>
-      <div class="back">?</div>
-    `;
+    c.innerHTML=`<div class="front">Kartu ${i+1}</div><div class="back"><span class="label">?</span></div>`;
     c.addEventListener('click',onCardClick);
     gridWrap.appendChild(c);
   }
 }
 
-function setStatus(txt){
-  status.textContent='Status: '+txt;
+function setStatus(txt){status.textContent='Status: '+txt;}
+
+function fetchConfig(){
+  onValue(dbRef,(snap)=>{
+    if(snap.exists()){
+      serverConfig = snap.val();
+      setStatus('Siap - data tersedia');
+      if(!unlocked) buildGrid();
+    }else setStatus('Belum ada konfigurasi');
+  });
 }
 
-onValue(dbRef,(snap)=>{
-  if(snap.exists()){
-    serverConfig = snap.val();
-    setStatus('Siap - data tersedia');
-    if(!unlocked) buildGrid();
-  } else {
-    setStatus('Belum ada konfigurasi');
-  }
-});
-
-function onCardClick(e){
+async function onCardClick(e){
   if(selectedCount>=maxSelect) return;
-  const el=e.currentTarget;
-  const idx=Number(el.dataset.index);
+  const el = e.currentTarget;
+  const idx = Number(el.dataset.index);
   if(!unlocked || revealed.has(idx)) return;
 
   const cards = serverConfig?.cards||[];
-  const value = cards[idx] || 'Kosong';
-
-  el.classList.add('flipped');
-  el.querySelector('.back').textContent = value;
+  const value = cards[idx]||'Kosong';
+  el.classList.add('flip');
+  el.querySelector('.label').textContent = value;
   revealed.add(idx);
   selectedCount++;
 
-  const msg=document.createElement('div');
-  msg.className='small';
-  msg.textContent=`Kamu membuka Kartu ${idx+1}: ${value}`;
+  const msg = document.createElement('div');
+  msg.className = 'small';
+  msg.textContent = `Kamu membuka Kartu ${idx+1}: ${value}`;
   resultArea.prepend(msg);
 
-  // Simpan ke usedCodes jika sudah pilih max
   if(selectedCount>=maxSelect){
     saveUsedCode();
   }
 }
 
 async function saveUsedCode(){
-  if(!serverConfig) return;
   const code = codeInput.value.trim();
-  const cards = Array.from(gridWrap.querySelectorAll('.card')).map(c=>{
-    return c.classList.contains('flipped') ? c.querySelector('.back').textContent : null;
-  });
-  try{
-    const snap = await get(ref(db, "gameConfig/usedCodes/"+code));
-    if(snap.exists()){
-      setStatus("Kode sudah pernah dipakai");
-      return;
-    }
-    await set(ref(db, "gameConfig/usedCodes/"+code), {
-      cards,
-      createdAt: Date.now(),
-      used: true
-    });
-    setStatus("Kode & kartu tersimpan di histori ✓");
-  }catch(err){
-    console.error(err);
-    setStatus("Gagal menyimpan: "+err.message);
-  }
+  if(!code || !serverConfig) return;
+  const snap = await get(ref(db, "gameConfig/usedCodes/"+code));
+  if(snap.exists()){ setStatus("Kode sudah dipakai"); return; }
+  const cardsArr = Array.from(gridWrap.querySelectorAll('.card')).map(c=>c.classList.contains('flip')?c.querySelector('.label').textContent:null);
+  await set(ref(db,"gameConfig/usedCodes/"+code), {cards:cardsArr, time:Date.now()});
+  setStatus("Kode & kartu tersimpan ✓");
 }
 
 verifyBtn.addEventListener('click',()=>{
-  const code = (codeInput.value||'').trim();
-  if(!serverConfig){setStatus('Tidak ada konfigurasi');return;}
-  if(code===serverConfig.code){
-    unlocked=true;
-    setStatus('Kode benar — pilih kartu!');
-    document.querySelectorAll('.card').forEach(c=>c.classList.remove('locked'));
-  } else {
-    unlocked=false;
-    setStatus('Kode salah');
-  }
+  const code = codeInput.value.trim();
+  if(!serverConfig){setStatus('Tidak ada konfigurasi'); return;}
+  if(code===serverConfig.code){unlocked=true; setStatus('Kode benar — pilih kartu!'); document.querySelectorAll('.card').forEach(c=>c.classList.remove('locked'));}
+  else{unlocked=false; setStatus('Kode salah');}
 });
 
 buildGrid();
+fetchConfig();
 </script>
 </body>
 </html>
