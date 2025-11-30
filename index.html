@@ -1,362 +1,193 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>User - Tebak Kartu Natal (Final)</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Natal Glow Reward</title>
+
 <style>
-  :root{
-    --bg1:#071229;
-    --bg2:#0c1624;
-    --gold:#ffef9f;
-    --accent:#d4af37;
-    --muted:#bfc6c9;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0;font-family:'Poppins',system-ui,Segoe UI,Roboto; background:linear-gradient(180deg,var(--bg1),var(--bg2)); color:#fff;
-    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden;
-  }
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
-  /* Floating decorations (trees + snow) */
-  .dec{
-    position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none;z-index:0;
-  }
-  .dec .tree{
-    position:absolute;width:36px;height:52px;background:linear-gradient(#0a7b1f,#00c04a);
-    clip-path:polygon(50% 0,0 100%,100% 100%);opacity:.75;filter:drop-shadow(0 6px 14px rgba(0,0,0,.6));
-    animation:treeFall linear infinite;
-  }
-  @keyframes treeFall{0%{transform:translateY(-80px) scale(.6);opacity:.7}100%{transform:translateY(110vh) scale(1);opacity:0}}
-  .dec .snow{position:absolute;width:8px;height:8px;background:#fff;border-radius:50%;opacity:.85;animation:snowFall linear infinite}
-  @keyframes snowFall{0%{transform:translateY(-10px)}100%{transform:translateY(110vh)}}
+    body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background: #0c0f12;
+        color: #fff;
+        overflow-x: hidden;
+    }
 
-  /* Main container */
-  .wrap{
-    width:100%;max-width:980px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12));
-    border-radius:18px;padding:26px;border:1px solid rgba(212,175,55,0.08);box-shadow:0 20px 60px rgba(2,6,23,0.6);
-    position:relative;z-index:1;
-  }
+    /* ❄ Animasi Salju */
+    .snow {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        top: 0;
+        left: 0;
+        background-image:
+            url('https://i.ibb.co/FXpbV3h/snow1.png'),
+            url('https://i.ibb.co/FXpbV3h/snow2.png'),
+            url('https://i.ibb.co/FXpbV3h/snow3.png');
+        animation: snow 20s linear infinite;
+    }
+    @keyframes snow {
+        0% { background-position: 0 0, 0 0, 0 0; }
+        100% { background-position: 0 2000px, 0 1500px, 0 1000px; }
+    }
 
-  header{display:flex;align-items:center;gap:16px;justify-content:space-between;flex-wrap:wrap}
-  .title{
-    display:flex;gap:12px;align-items:center;
-  }
-  .title h1{margin:0;font-size:26px;color:var(--gold);text-shadow:0 4px 18px rgba(212,175,55,.12)}
-  .subtitle{color:var(--muted);font-size:13px;margin:0}
+    /* 🎄 Background Pohon Natal bergerak */
+    .tree-bg {
+        position: fixed;
+        inset: 0;
+        background: url("https://i.ibb.co/QpnSfGm/christmastree.png") center/contain no-repeat;
+        opacity: 0.12;
+        animation: floatTree 6s ease-in-out infinite alternate;
+        pointer-events: none;
+    }
+    @keyframes floatTree {
+        from { transform: translateY(-10px); }
+        to { transform: translateY(10px); }
+    }
 
-  /* code row */
-  .code-row{display:flex;gap:12px;align-items:center;margin-top:18px;flex-wrap:wrap}
-  input[type="text"]{padding:12px 14px;border-radius:10px;border:none;background:#0b1216;color:#fff;min-width:180px;flex:1;font-weight:600}
-  .btn{background:var(--gold);color:#111;padding:11px 16px;border-radius:10px;border:none;font-weight:700;cursor:pointer}
-  .btn:disabled{opacity:.6;cursor:not-allowed}
+    .container {
+        position: relative;
+        z-index: 5;
+        padding: 25px;
+        max-width: 450px;
+        margin: auto;
+        text-align: center;
+    }
 
-  /* prize list */
-  .prize-list{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap;justify-content:center}
-  .prize{
-    flex:1 1 28%;min-width:160px;padding:14px;border-radius:12px;
-    background:linear-gradient(135deg,#ff4d4d,#ffb84d,#4caf50);
-    color:#111;font-weight:800;text-align:center;font-size:16px;box-shadow:0 8px 30px rgba(0,0,0,.45);
-    border:2px solid rgba(255,255,255,.12);
-    position:relative;
-  }
-  .prize::before{content:"🎄";position:absolute;left:10px;top:-10px;font-size:20px}
-  .prize small{display:block;color:#222;font-weight:700;margin-top:6px;font-size:12px}
+    h1 {
+        font-size: 32px;
+        color: #e8c65f;
+        text-shadow: 0 0 12px rgba(255,230,140,0.9);
+        margin-bottom: 10px;
+    }
 
-  /* grid cards */
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:22px}
-  .card{height:150px;border-radius:14px;perspective:1200px;position:relative;cursor:pointer}
-  .card.locked{filter:grayscale(.25) blur(.2px);cursor:not-allowed;opacity:.9}
-  .card-inner{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d;border-radius:14px}
-  .card.flip .card-inner{transform:rotateY(180deg)}
-  .card-front,.card-back{
-    position:absolute;inset:0;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:700;
-    backface-visibility:hidden;padding:12px;text-align:center;
-  }
-  .card-front{background:linear-gradient(180deg,#071018,#0b1013);border:1px solid rgba(255,255,255,0.04);color:var(--muted);font-size:18px}
-  .card-back{background:linear-gradient(135deg,#fff7d0,#ffd87a);transform:rotateY(180deg);color:#111;font-size:18px}
-  .card .label{font-weight:800}
+    .inputBox {
+        background: rgba(255,255,255,0.07);
+        padding: 15px;
+        border-radius: 14px;
+        border: 1px solid rgba(255,215,0,0.3);
+        box-shadow: 0 0 12px rgba(255,215,0,0.2);
+    }
 
-  /* result area */
-  .result{margin-top:18px;display:flex;flex-direction:column;gap:8px;align-items:center}
-  .result .small{color:var(--muted);font-size:13px}
+    input {
+        width: 100%;
+        padding: 14px;
+        border-radius: 10px;
+        border: none;
+        font-size: 16px;
+        outline: none;
+        margin-bottom: 10px;
+        background: rgba(255,255,255,0.13);
+        color: #fff;
+    }
 
-  /* confetti small pieces */
-  .confetti{position:fixed;width:8px;height:8px;border-radius:2px;pointer-events:none;animation:confettiDrop 900ms linear forwards;z-index:20}
-  @keyframes confettiDrop{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(180px) rotate(360deg);opacity:0}}
+    button {
+        width: 100%;
+        padding: 14px;
+        border-radius: 10px;
+        border: none;
+        background: linear-gradient(45deg,#d4af37,#ffef9f);
+        color: #111;
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 16px;
+        box-shadow: 0 0 15px rgba(255,215,0,0.5);
+        transition: .2s;
+    }
+    button:active {
+        transform: scale(.97);
+    }
 
-  /* mobile tweaks */
-  @media (max-width:720px){
-    .prize{flex:1 1 47%}
-    .grid{grid-template-columns:repeat(2,1fr)}
-    .card{height:130px}
-  }
+    /* 🎁 Kotak hadiah (hasil cek) */
+    .hasilBox {
+        margin-top: 20px;
+        background: rgba(255,255,255,0.08);
+        padding: 18px;
+        border-radius: 14px;
+        border: 1px solid rgba(255,215,0,0.3);
+        box-shadow: 0 0 14px rgba(200,150,50,0.25);
+        display: none;
+    }
+
+    .rewardItem {
+        background: rgba(255,255,255,0.12);
+        margin: 8px 0;
+        padding: 12px;
+        border-radius: 10px;
+        border-left: 4px solid #d4af37;
+        font-size: 17px;
+        text-align: left;
+    }
 </style>
 </head>
 <body>
 
-  <!-- Decorations (trees + snow) -->
-  <div class="dec" id="decContainer"></div>
+<div class="snow"></div>
+<div class="tree-bg"></div>
 
-  <main class="wrap" role="main" aria-live="polite">
-    <header>
-      <div class="title">
-        <h1>Event Tebak Kartu — Natal</h1>
-        <div style="display:block">
-          <p class="subtitle">Masukkan kode yang diberikan admin, pilih maksimal 3 kartu — kode hanya sekali pakai</p>
-        </div>
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:12px;color:var(--muted)">Project: <strong>hadiahnatal-a033b</strong></div>
-      </div>
-    </header>
+<div class="container">
+    <h1>🎄 Natal Glow Reward</h1>
 
-    <div class="code-row" style="margin-top:6px">
-      <input id="codeInput" type="text" placeholder="Masukkan kode akses..."/>
-      <button id="verifyBtn" class="btn">Verify</button>
-      <div id="status" class="small" style="min-width:200px;text-align:center">Status: belum terkoneksi</div>
+    <div class="inputBox">
+        <input type="text" id="codeInput" placeholder="Masukkan Kode Hadiah">
+        <button id="checkBtn">CEK HADIAH</button>
     </div>
 
-    <div class="prize-list" aria-hidden="false">
-      <div class="prize">🎁 Platinum<br/><small>10,000</small></div>
-      <div class="prize">🎅 Diamond<br/><small>25,000</small></div>
-      <div class="prize">❄ Super Diamond<br/><small>500,000</small></div>
-    </div>
-
-    <section id="gridWrap" class="grid" aria-label="Grid Kartu"></section>
-
-    <div class="result" id="resultArea" aria-live="polite"></div>
-  </main>
+    <div id="hasil" class="hasilBox"></div>
+</div>
 
 <script type="module">
-  // Firebase (modular)
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-  import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDlpuf_uIlpmr2ybAqpJ2GTTRW-t86PGf0",
-    authDomain: "hadiahnatal-a033b.firebaseapp.com",
-    databaseURL: "https://hadiahnatal-a033b-default-rtdb.firebaseio.com",
-    projectId: "hadiahnatal-a033b",
-    storageBucket: "hadiahnatal-a033b.firebasestorage.app",
-    messagingSenderId: "577153304596",
-    appId: "1:577153304596:web:5f255e886a379ccb12bf01",
-    measurementId: "G-C5Q83YQ6SK"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyDlpuf_uIlpmr2ybAqpJ2GTTRW-t86PGf0",
+  authDomain: "hadiahnatal-a033b.firebaseapp.com",
+  databaseURL: "https://hadiahnatal-a033b-default-rtdb.firebaseio.com",
+  projectId: "hadiahnatal-a033b",
+  storageBucket: "hadiahnatal-a033b.firebasestorage.app",
+  messagingSenderId: "577153304596",
+  appId: "1:577153304596:web:5f255e886a379ccb12bf01"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-  // refs
-  const configRef = ref(db, "gameConfig/cards");
-  const usedRefRoot = ref(db, "gameConfig/usedCodes");
+const input = document.getElementById("codeInput");
+const btn = document.getElementById("checkBtn");
+const hasil = document.getElementById("hasil");
 
-  // UI
-  const decContainer = document.getElementById('decContainer');
-  const gridWrap = document.getElementById('gridWrap');
-  const verifyBtn = document.getElementById('verifyBtn');
-  const codeInput = document.getElementById('codeInput');
-  const statusEl = document.getElementById('status');
-  const resultArea = document.getElementById('resultArea');
+btn.onclick = async () => {
+    const code = input.value.trim();
+    if(!code) return;
 
-  let serverConfig = null;
-  let unlocked = false;
-  let revealed = new Set();
-  const maxSelect = 3;
-  let selectedCount = 0;
+    const codeRef = ref(db, "history/" + code);
+    const snap = await get(codeRef);
 
-  // --- Decorations: trees + snow ---
-  function spawnTree(){
-    const t = document.createElement('div');
-    t.className = 'tree';
-    t.style.left = (Math.random()*100) + 'vw';
-    t.style.animationDuration = (8 + Math.random()*8) + 's';
-    decContainer.appendChild(t);
-    setTimeout(()=>t.remove(), 18000);
-  }
-  function spawnSnow(){
-    const s = document.createElement('div');
-    s.className = 'snow';
-    s.style.left = (Math.random()*100) + 'vw';
-    s.style.animationDuration = (4 + Math.random()*6) + 's';
-    decContainer.appendChild(s);
-    setTimeout(()=>s.remove(), 10000);
-  }
-  setInterval(spawnTree, 900);
-  setInterval(spawnSnow, 140);
-
-  // --- Build grid placeholders ---
-  function buildGrid(){
-    gridWrap.innerHTML = '';
-    for(let i=0;i<9;i++){
-      const c = document.createElement('div');
-      c.className = 'card locked';
-      c.dataset.index = i;
-      c.innerHTML = `
-        <div class="card-inner">
-          <div class="card-front">Kartu ${i+1}</div>
-          <div class="card-back"><span class="label">?</span></div>
-        </div>
-      `;
-      c.addEventListener('click', onCardClick);
-      gridWrap.appendChild(c);
-    }
-  }
-
-  // --- status helper ---
-  function setStatus(txt, ok=true){
-    statusEl.textContent = 'Status: ' + txt;
-    statusEl.style.color = ok ? 'var(--muted)' : '#ff9a9a';
-  }
-
-  // --- Fetch admin config realtime ---
-  onValue(configRef, snap=>{
-    if(snap.exists()){
-      serverConfig = snap.val();
-      setStatus('Siap — data tersedia 🎁');
-      if(!unlocked) buildGrid();
-    } else {
-      serverConfig = null;
-      setStatus('Belum ada konfigurasi admin', false);
-      buildGrid();
-    }
-  }, err=>{
-    console.error(err);
-    setStatus('Gagal memuat konfigurasi', false);
-  });
-
-  // --- verify code: check if code exists in usedCodes first ---
-  async function verifyCode(code){
-    // check if already used
-    try{
-      const usedSnap = await get(ref(db, "gameConfig/usedCodes/" + code));
-      if(usedSnap.exists()){
-        return { ok:false, msg: "Kode sudah pernah dipakai" };
-      }
-      // check admin code exists and matches
-      if(!serverConfig) return { ok:false, msg: "Tidak ada konfigurasi admin" };
-      if(code !== (serverConfig.code || '')) return { ok:false, msg: "Kode salah" };
-      return { ok:true, msg: "Kode valid" };
-    }catch(err){
-      console.error(err);
-      return { ok:false, msg: "Error verifikasi" };
-    }
-  }
-
-  // --- card click handler ---
-  async function onCardClick(e){
-    if(selectedCount >= maxSelect) return;
-    const el = e.currentTarget;
-    const idx = Number(el.dataset.index);
-    if(!unlocked || revealed.has(idx)) return;
-
-    // reveal value from serverConfig.cards
-    const cardsArr = serverConfig && serverConfig.cards ? serverConfig.cards : [];
-    const val = cardsArr[idx] || 'Kosong';
-
-    // flip
-    el.classList.add('flip');
-    el.querySelector('.label').textContent = val;
-    revealed.add(idx);
-    selectedCount++;
-
-    // show message
-    const msg = document.createElement('div');
-    msg.className = 'small';
-    msg.textContent = `Kamu membuka Kartu ${idx+1}: ${val}`;
-    resultArea.prepend(msg);
-
-    // confetti for special
-    if(['Platinum','Diamond','Super Diamond'].includes(val)){
-      const r = el.getBoundingClientRect();
-      spawnConfetti(r.left + r.width/2, r.top + r.height/2);
-    }
-
-    // if reached max -> save used code
-    if(selectedCount >= maxSelect){
-      await saveUsedCode();
-      // lock further clicks visually
-      document.querySelectorAll('.card').forEach(c=>c.classList.add('locked'));
-    }
-  }
-
-  // --- spawn confetti pieces ---
-  function spawnConfetti(x,y){
-    for(let i=0;i<22;i++){
-      const el = document.createElement('div');
-      el.className = 'confetti';
-      el.style.left = (x + (Math.random()*80 - 40)) + 'px';
-      el.style.top = (y + (Math.random()*40 - 20)) + 'px';
-      el.style.background = ['#ffef9f','#ff4d4d','#4caf50','#ffffff'][Math.floor(Math.random()*4)];
-      document.body.appendChild(el);
-      setTimeout(()=>el.remove(), 1000);
-    }
-  }
-
-  // --- save used code to Firebase in required format ---
-  async function saveUsedCode(){
-    const code = (codeInput.value || '').trim();
-    if(!code) { setStatus('Masukkan kode sebelum menyimpan', false); return; }
-    if(!serverConfig) { setStatus('Tidak ada konfigurasi admin', false); return; }
-
-    try{
-      // re-check if someone else used the code meanwhile
-      const snap = await get(ref(db, "gameConfig/usedCodes/" + code));
-      if(snap.exists()){
-        setStatus('Kode sudah dipakai oleh orang lain', false);
+    if(!snap.exists()){
+        hasil.style.display = "block";
+        hasil.innerHTML = `<div class="rewardItem" style="border-left-color:#ff6b6b;">Kode tidak ditemukan</div>`;
         return;
-      }
-
-      // create array of selected card values (preserve order by index)
-      const cardsResult = Array.from(gridWrap.querySelectorAll('.card'))
-        .map(c => c.classList.contains('flip') ? c.querySelector('.label').textContent : null);
-
-      // write the JSON structure required
-      await set(ref(db, "gameConfig/usedCodes/" + code), {
-        cards: cardsResult,
-        time: Date.now(),
-        used: true
-      });
-
-      setStatus('Kode & kartu tersimpan ✓');
-      // disable further verify/use of this code locally
-      unlocked = false;
-      verifyBtn.disabled = true;
-      codeInput.disabled = true;
-    }catch(err){
-      console.error(err);
-      setStatus('Gagal menyimpan: ' + (err.message || err), false);
     }
-  }
 
-  // --- verify button event ---
-  verifyBtn.addEventListener('click', async ()=>{
-    const code = (codeInput.value || '').trim();
-    if(!code){ setStatus('Masukkan kode dulu', false); return; }
-    setStatus('Memeriksa kode...');
-    verifyBtn.disabled = true;
-    const res = await verifyCode(code);
-    verifyBtn.disabled = false;
-    if(!res.ok){
-      setStatus(res.msg, false);
-      unlocked = false;
-      // visual lock
-      document.querySelectorAll('.card').forEach(c=>c.classList.add('locked'));
-      return;
-    }
-    // success
-    unlocked = true;
-    selectedCount = 0;
-    revealed.clear();
-    // reset visuals and enable cards
-    buildGrid();
-    setStatus('Kode benar — silakan pilih sampai 3 kartu 🎁');
-  });
+    const data = snap.val();
 
-  // build initial grid
-  buildGrid();
+    // tampilkan hadiah
+    hasil.style.display = "block";
+    hasil.innerHTML = `
+        <div class="rewardItem"><strong>Kode:</strong> ${code}</div>
+        <div class="rewardItem"><strong>Hadiah:</strong> ${data.cards.join(", ")}</div>
+        <div class="rewardItem"><strong>Waktu:</strong> ${new Date(data.time).toLocaleString()}</div>
+        <div class="rewardItem"><strong>Status:</strong> ${data.used ? "Sudah digunakan ❌" : "Belum digunakan ✔"}</div>
+    `;
+
+    // tandai sebagai used
+    await update(codeRef,{ used:true });
+};
 </script>
 
 </body>
