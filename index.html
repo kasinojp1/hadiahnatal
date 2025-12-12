@@ -18,13 +18,16 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{font-family:'Poppins',system-ui; background:linear-gradient(180deg,var(--bg1),var(--bg2)); color:#fff; min-height:100vh; padding:10px;}
 
+/* Header */
 header{display:flex; flex-direction:column; align-items:center; gap:10px; text-align:center; margin-bottom:20px; position:relative;}
 .title h1{font-size:28px; background:linear-gradient(90deg,#ffef9f,#d4af37); -webkit-background-clip:text; color:transparent; text-shadow:0 4px 18px rgba(212,175,55,.3); position:relative; animation:glow 1.5s infinite alternate;}
 @keyframes glow{0%{text-shadow:0 0 8px #ffd966,0 0 12px #ffef9f;}100%{text-shadow:0 0 16px #ffd966,0 0 24px #ffef9f;}}
 .subtitle{font-size:14px; color:var(--muted);}
 
+/* Main Wrap */
 .wrap{width:100%; max-width:520px; margin:0 auto; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12)); border-radius:20px; padding:25px; border:1px solid rgba(212,175,55,0.08); box-shadow:0 15px 40px rgba(2,6,23,0.7); position:relative; z-index:1;}
 
+/* Input Row */
 .code-row{display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-bottom:20px;}
 input[type="text"]{padding:12px 16px; border-radius:12px; border:none; background:#0b1216; color:#fff; min-width:200px; flex:1; font-weight:600; transition:0.3s;}
 input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
@@ -33,12 +36,16 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
 .btn:disabled{opacity:.6; cursor:not-allowed;}
 #status{margin-top:5px; font-size:13px; color:var(--muted); text-align:center;}
 
-.prize-list{display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-bottom:25px;}
+/* Prize List */
+.prize-section{margin-bottom:40px;} /* wrapper untuk hadiah */
+.prize-list{display:flex; flex-wrap:wrap; gap:12px; justify-content:center;}
 .prize{flex:1 1 28%; min-width:160px; padding:14px; border-radius:14px; background:linear-gradient(135deg,#ffb84d,#ffd966,#ffd966); color:#111; font-weight:800; text-align:center; font-size:16px; box-shadow:0 8px 35px rgba(0,0,0,.45); border:2px solid rgba(255,255,255,.12); position:relative; transition:0.3s;}
 .prize:hover{transform:translateY(-3px) scale(1.03); box-shadow:0 12px 40px rgba(212,175,55,.7);}
 .prize::before{content:"🎄"; position:absolute; left:10px; top:-10px; font-size:20px;}
 .prize small{display:block; margin-top:6px; font-size:12px; color:#222;}
 
+/* Card Grid */
+.grid-section{margin-top:30px;} /* wrapper untuk grid kartu */
 .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
 .card{height:150px; border-radius:16px; perspective:1200px; position:relative; cursor:pointer; transition:0.4s;}
 .card.locked{filter:grayscale(.25) blur(.2px); cursor:not-allowed; opacity:.9;}
@@ -48,15 +55,18 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
 .card-front{background:linear-gradient(180deg,#071018,#0b1013); border:1px solid rgba(255,255,255,0.06); color:var(--muted); font-size:18px; box-shadow:0 4px 15px rgba(0,0,0,.4);}
 .card-back{background:linear-gradient(135deg,#fff7d0,#ffd87a); transform:rotateY(180deg); color:#111; font-size:18px; box-shadow:0 4px 15px rgba(0,0,0,.5);}
 
+/* Result Area */
 .result{margin-top:20px; display:flex; flex-direction:column; gap:8px; align-items:center;}
 .result .small{color:var(--muted); font-size:13px;}
 
+/* Decorations */
 .dec{position:fixed; left:0; top:0; right:0; bottom:0; pointer-events:none; z-index:0;}
 .dec .tree{position:absolute; width:36px; height:52px; background:linear-gradient(#0a7b1f,#00c04a); clip-path:polygon(50% 0,0 100%,100% 100%); opacity:.75; filter:drop-shadow(0 6px 14px rgba(0,0,0,.6)); animation:treeFall linear infinite;}
 @keyframes treeFall{0%{transform:translateY(-80px) scale(.6);opacity:.7}100%{transform:translateY(110vh) scale(1);opacity:0}}
 .dec .snow{position:absolute;width:8px;height:8px;background:#fff;border-radius:50%;opacity:.85;animation:snowFall linear infinite;}
 @keyframes snowFall{0%{transform:translateY(-10px)}100%{transform:translateY(110vh)}}
 
+/* Confetti */
 .confetti{position:fixed;width:8px;height:8px;border-radius:2px; pointer-events:none; animation:confettiDrop 900ms linear forwards; z-index:20;}
 @keyframes confettiDrop{0%{transform:translateY(0) rotate(0); opacity:1}100%{transform:translateY(180px) rotate(360deg); opacity:0}}
 
@@ -81,20 +91,28 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
     <div id="status">Status: belum terkoneksi</div>
   </div>
 
-  <div class="prize-list">
-    <div class="prize">🎁⛄ PLATINUM<br/><small>10,000</small></div>
-    <div class="prize">🎁⛄ DIAMOND<br/><small>25,000</small></div>
-    <div class="prize">🎁⛄ SILVER DIAMOND<br/><small>50,000</small></div>
-    <div class="prize">🎁⛄ PERFECT DIAMOND<br/><small>100,000</small></div>
-    <div class="prize">🎁⛄ EPIC DIAMOND<br/><small>150,000</small></div>
-    <div class="prize">🎁⛄ MHYTIC DIAMOND<br/><small>400,000</small></div>
+  <!-- Prize Section -->
+  <div class="prize-section">
+    <div class="prize-list">
+      <div class="prize">🎁⛄ PLATINUM<br/><small>10,000</small></div>
+      <div class="prize">🎁⛄ DIAMOND<br/><small>25,000</small></div>
+      <div class="prize">🎁⛄ SILVER DIAMOND<br/><small>50,000</small></div>
+      <div class="prize">🎁⛄ PERFECT DIAMOND<br/><small>100,000</small></div>
+      <div class="prize">🎁⛄ EPIC DIAMOND<br/><small>150,000</small></div>
+      <div class="prize">🎁⛄ MHYTIC DIAMOND<br/><small>400,000</small></div>
+    </div>
   </div>
 
-  <section id="gridWrap" class="grid"></section>
+  <!-- Card Section -->
+  <div class="grid-section">
+    <section id="gridWrap" class="grid"></section>
+  </div>
+
   <div class="result" id="resultArea" aria-live="polite"></div>
 </main>
 
 <script type="module">
+// Script tetap sama seperti versi sebelumnya
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
@@ -172,23 +190,18 @@ async function onCardClick(e){
   if(!unlocked || revealed.has(idx)) return;
   const cardsArr=serverConfig?.cards||[];
   let val=cardsArr[idx]||'Kosong';
-  
   if(selectedCount>0 && val!==cardsArr[0]) val='ZONK';
-  
   el.classList.add('flip');
   el.querySelector('.label').textContent=val;
   revealed.add(idx);
   selectedCount++;
-  
   const msg=document.createElement('div'); msg.className='small';
   msg.textContent=`Kamu membuka Kartu ${idx+1}: ${val}`;
   resultArea.prepend(msg);
-
   if(['Platinum','Diamond','Super Diamond'].includes(val)){
     const r=el.getBoundingClientRect();
     spawnConfetti(r.left+r.width/2,r.top+r.height/2);
   }
-
   if(selectedCount>=maxSelect){
     await saveUsedCode();
     document.querySelectorAll('.card').forEach(c=>c.classList.add('locked'));
