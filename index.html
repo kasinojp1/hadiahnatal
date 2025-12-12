@@ -20,12 +20,51 @@ html,body{font-family:'Poppins',system-ui; background:linear-gradient(180deg,var
 
 /* Header */
 header{display:flex; flex-direction:column; align-items:center; gap:10px; text-align:center; margin-bottom:20px; position:relative;}
-.title h1{font-size:28px; background:linear-gradient(90deg,#ffef9f,#d4af37); -webkit-background-clip:text; color:transparent; text-shadow:0 4px 18px rgba(212,175,55,.3); position:relative; animation:glow 1.5s infinite alternate;}
-@keyframes glow{0%{text-shadow:0 0 8px #ffd966,0 0 12px #ffef9f;}100%{text-shadow:0 0 16px #ffd966,0 0 24px #ffef9f;}}
+
+/* Lampu Natal bergaris horizontal di atas judul */
+.lights-row {
+  display:flex;
+  justify-content:space-between;
+  width:100%;
+  max-width:520px;
+  margin-bottom:8px;
+}
+.light {
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  box-shadow:0 0 6px rgba(255,255,255,0.6);
+  animation:blink 1.5s infinite alternate;
+}
+.light:nth-child(4n+1){background:red; animation-delay:0s;}
+.light:nth-child(4n+2){background:green; animation-delay:.3s;}
+.light:nth-child(4n+3){background:yellow; animation-delay:.6s;}
+.light:nth-child(4n+4){background:blue; animation-delay:.9s;}
+
+@keyframes blink {
+  0% {opacity:0.3; transform:scale(0.8);}
+  50% {opacity:1; transform:scale(1);}
+  100% {opacity:0.3; transform:scale(0.8);}
+}
+
+/* Judul */
+.title h1{
+  font-size:28px;
+  background:linear-gradient(90deg,#ffef9f,#d4af37);
+  -webkit-background-clip:text;
+  color:transparent;
+  text-shadow:0 4px 18px rgba(212,175,55,.3);
+  position:relative;
+  animation:glow 1.5s infinite alternate;
+}
+@keyframes glow{
+  0%{text-shadow:0 0 8px #ffd966,0 0 12px #ffef9f;}
+  100%{text-shadow:0 0 16px #ffd966,0 0 24px #ffef9f;}
+}
 .subtitle{font-size:14px; color:var(--muted);}
 
 /* Main Wrap */
-.wrap{width:100%; max-width:520px; margin:0 auto; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12)); border-radius:20px; padding:25px; border:1px solid rgba(212,175,55,0.08); box-shadow:0 15px 40px rgba(2,6,23,0.7); position:relative; z-index:1;}
+.wrap{width:100%; max-width:520px; margin:0 auto; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12)); border-radius:20px; padding:25px; border:1px solid rgba(212,175,55,0.08); box-shadow:0 15px 40px rgba(2,6,23,0.7);}
 
 /* Input Row */
 .code-row{display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-bottom:20px;}
@@ -36,7 +75,7 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
 .btn:disabled{opacity:.6; cursor:not-allowed;}
 #status{margin-top:5px; font-size:13px; color:var(--muted); text-align:center;}
 
-/* Prize List - warna merah Natal */
+/* Prize List - merah Natal */
 .prize-section{margin-bottom:40px;}
 .prize-list{display:flex; flex-wrap:wrap; gap:12px; justify-content:center;}
 .prize{
@@ -44,7 +83,7 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
   min-width:160px;
   padding:16px;
   border-radius:16px;
-  background:linear-gradient(135deg,#d62828,#f94144,#ff6b6b,#ffd166); /* dominan merah */
+  background:linear-gradient(135deg,#d62828,#f94144,#ff6b6b,#ffd166);
   color:#111;
   font-weight:800;
   text-align:center;
@@ -74,26 +113,22 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
 .result{margin-top:20px; display:flex; flex-direction:column; gap:8px; align-items:center;}
 .result .small{color:var(--muted); font-size:13px;}
 
-/* Decorations */
-.dec{position:fixed; left:0; top:0; right:0; bottom:0; pointer-events:none; z-index:0;}
-.dec .tree{position:absolute; width:36px; height:52px; background:linear-gradient(#0a7b1f,#00c04a); clip-path:polygon(50% 0,0 100%,100% 100%); opacity:.75; filter:drop-shadow(0 6px 14px rgba(0,0,0,.6)); animation:treeFall linear infinite;}
-@keyframes treeFall{0%{transform:translateY(-80px) scale(.6);opacity:.7}100%{transform:translateY(110vh) scale(1);opacity:0}}
-.dec .snow{position:absolute;width:8px;height:8px;background:#fff;border-radius:50%;opacity:.85;animation:snowFall linear infinite;}
-@keyframes snowFall{0%{transform:translateY(-10px)}100%{transform:translateY(110vh}}
-
-/* Confetti */
-.confetti{position:fixed;width:8px;height:8px;border-radius:2px; pointer-events:none; animation:confettiDrop 900ms linear forwards; z-index:20;}
-@keyframes confettiDrop{0%{transform:translateY(0) rotate(0); opacity:1}100%{transform:translateY(180px) rotate(360deg); opacity:0}}
-
 @media (max-width:720px){.prize{flex:1 1 47%}.grid{grid-template-columns:repeat(2,1fr)}.card{height:130px}}
 </style>
 </head>
 <body>
 
-<div class="dec" id="decContainer"></div>
-
 <main class="wrap" role="main" aria-live="polite">
   <header>
+    <div class="lights-row">
+      <!-- Buat 20 lampu di atas judul -->
+      <div class="light"></div><div class="light"></div><div class="light"></div><div class="light"></div>
+      <div class="light"></div><div class="light"></div><div class="light"></div><div class="light"></div>
+      <div class="light"></div><div class="light"></div><div class="light"></div><div class="light"></div>
+      <div class="light"></div><div class="light"></div><div class="light"></div><div class="light"></div>
+      <div class="light"></div><div class="light"></div><div class="light"></div><div class="light"></div>
+    </div>
+
     <div class="title">
       <h1>Event Tebak Kartu — Natal KASINOJP</h1>
       <p class="subtitle">Masukkan kode yang diberikan admin, pilih maksimal 3 kartu — kode hanya sekali pakai</p>
@@ -145,7 +180,6 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const configRef = ref(db, "gameConfig/cards");
 
-const decContainer = document.getElementById('decContainer');
 const gridWrap = document.getElementById('gridWrap');
 const verifyBtn = document.getElementById('verifyBtn');
 const codeInput = document.getElementById('codeInput');
@@ -157,10 +191,6 @@ let unlocked = false;
 let revealed = new Set();
 const maxSelect = 3;
 let selectedCount = 0;
-
-function spawnTree(){const t=document.createElement('div');t.className='tree';t.style.left=(Math.random()*100)+'vw';t.style.animationDuration=(8+Math.random()*8)+'s';decContainer.appendChild(t);setTimeout(()=>t.remove(),18000);}
-function spawnSnow(){const s=document.createElement('div');s.className='snow';s.style.left=(Math.random()*100)+'vw';s.style.animationDuration=(4+Math.random()*6)+'s';decContainer.appendChild(s);setTimeout(()=>s.remove(),10000);}
-setInterval(spawnTree,900);setInterval(spawnSnow,140);
 
 function buildGrid(){
   gridWrap.innerHTML='';
@@ -213,10 +243,6 @@ async function onCardClick(e){
   const msg=document.createElement('div'); msg.className='small';
   msg.textContent=`Kamu membuka Kartu ${idx+1}: ${val}`;
   resultArea.prepend(msg);
-  if(['Platinum','Diamond','Super Diamond'].includes(val)){
-    const r=el.getBoundingClientRect();
-    spawnConfetti(r.left+r.width/2,r.top+r.height/2);
-  }
   if(selectedCount>=maxSelect){
     await saveUsedCode();
     document.querySelectorAll('.card').forEach(c=>c.classList.add('locked'));
@@ -224,18 +250,6 @@ async function onCardClick(e){
     info.className='small';
     info.textContent='🎉 Hadiah sudah keluar! Silahkan hubungi admin untuk claim';
     resultArea.prepend(info);
-  }
-}
-
-function spawnConfetti(x,y){
-  for(let i=0;i<22;i++){
-    const el=document.createElement('div');
-    el.className='confetti';
-    el.style.left=(x+(Math.random()*80-40))+'px';
-    el.style.top=(y+(Math.random()*40-20))+'px';
-    el.style.background=['#ffef9f','#ff4d4d','#4caf50','#ffffff'][Math.floor(Math.random()*4)];
-    document.body.appendChild(el);
-    setTimeout(()=>el.remove(),1000);
   }
 }
 
@@ -271,6 +285,5 @@ verifyBtn.addEventListener('click',async ()=>{
 
 buildGrid();
 </script>
-
 </body>
 </html>
