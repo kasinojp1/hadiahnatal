@@ -75,7 +75,7 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
 .btn:disabled{opacity:.6; cursor:not-allowed;}
 #status{margin-top:5px; font-size:13px; color:var(--muted); text-align:center;}
 
-/* Prize List - merah Natal */
+/* Prize List - warna-warni animasi */
 .prize-section{margin-bottom:40px;}
 .prize-list{display:flex; flex-wrap:wrap; gap:12px; justify-content:center;}
 .prize{
@@ -92,10 +92,18 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
   border:2px solid rgba(255,255,255,.12);
   position:relative;
   transition:0.3s;
+  animation:colorChange 3s infinite alternate;
 }
 .prize:hover{transform:translateY(-3px) scale(1.05); box-shadow:0 12px 45px rgba(212,175,55,.8);}
 .prize::before{content:"🎄"; position:absolute; left:10px; top:-10px; font-size:22px; animation:twinkle 1.5s infinite alternate;}
 @keyframes twinkle{0%{transform:scale(1);opacity:0.6;}50%{transform:scale(1.2);opacity:1;}100%{transform:scale(1);opacity:0.6;}}
+@keyframes colorChange{
+  0%{background:linear-gradient(135deg,#d62828,#f94144);}
+  25%{background:linear-gradient(135deg,#ff6b6b,#ffd166);}
+  50%{background:linear-gradient(135deg,#06d6a0,#1b9aaa);}
+  75%{background:linear-gradient(135deg,#ff9f1c,#ff4040);}
+  100%{background:linear-gradient(135deg,#d62828,#f94144);}
+}
 .prize small{display:block; margin-top:6px; font-size:12px; color:#222;}
 
 /* Card Grid */
@@ -241,7 +249,7 @@ async function onCardClick(e){
   revealed.add(idx);
   selectedCount++;
   const msg=document.createElement('div'); msg.className='small';
-  msg.textContent=Kamu membuka Kartu ${idx+1}: ${val};
+  msg.textContent=`Kamu membuka Kartu ${idx+1}: ${val}`;
   resultArea.prepend(msg);
   if(selectedCount>=maxSelect){
     await saveUsedCode();
