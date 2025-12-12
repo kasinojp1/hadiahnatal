@@ -3,249 +3,194 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>User - Tebak Kartu Natal (Final)</title>
+<title>Tebak Kartu Natal — KASINOJP (Premium)</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
   :root{
-    --bg1:#060d1c;
-    --bg2:#0a1428;
+    --bg1:#040816;
+    --bg2:#0a1220;
     --gold:#ffe9a3;
-    --gold2:#d4af37;
-    --muted:#c7ccd1;
+    --gold-strong:#d4af37;
+    --muted:#bcc3c8;
+    --accent:#ff7b3a;
+    --card-front:#0f1720;
+    --card-back:#fff6d8;
   }
-  *{box-sizing:border-box;margin:0;padding:0}
 
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
   body{
-    font-family:'Poppins',sans-serif;
+    font-family:'Poppins',system-ui,Segoe UI,Roboto,sans-serif;
     background:linear-gradient(180deg,var(--bg1),var(--bg2));
     color:#fff;
-    padding:14px;
-    overflow-x:hidden;
+    padding:16px;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
   }
 
-  /* background anim */
-  .dec{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0;}
-  .tree,.snow{position:absolute;}
-  .tree{
-    width:36px;height:52px;
-    background:linear-gradient(#0b8c24,#1fe06f);
-    clip-path:polygon(50% 0,0 100%,100% 100%);
-    opacity:.75;
-    filter:drop-shadow(0 4px 12px rgba(0,0,0,.6));
-    animation:treeFall linear infinite;
+  /* ---------- controls top ---------- */
+  .controls{
+    max-width:980px;margin:0 auto 12px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;z-index:40;
   }
-  @keyframes treeFall{
-    0%{transform:translateY(-80px) scale(.6);opacity:1}
-    100%{transform:translateY(110vh) scale(1);opacity:0}
+  .toggle{
+    display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04)
   }
-  .snow{
-    width:8px;height:8px;border-radius:50%;background:white;opacity:.8;
-    animation:snowFall linear infinite;
-  }
-  @keyframes snowFall{
-    0%{transform:translateY(-30px) scale(1)}
-    100%{transform:translateY(120vh) scale(.7)}
-  }
+  .toggle button{background:transparent;border:none;color:var(--muted);cursor:pointer;font-weight:600}
+  .small-note{font-size:13px;color:var(--muted)}
 
-  /* container */
+  /* ---------- main wrap ---------- */
   .wrap{
-    width:100%;max-width:480px;margin:auto;
-    background:rgba(255,255,255,0.02);
-    border:1px solid rgba(255,255,255,0.08);
-    border-radius:18px;
-    padding:22px;
-    box-shadow:0 10px 40px rgba(0,0,0,.6);
-    position:relative;z-index:2;
+    max-width:520px;margin:12px auto;padding:20px;border-radius:18px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.08));border:1px solid rgba(255,255,255,0.06);box-shadow:0 12px 48px rgba(0,0,0,.6);position:relative;overflow:hidden;
+    transition:box-shadow .2s, border-color .2s, transform .12s;
   }
 
-  header h1{
-    font-size:22px;
-    color:var(--gold);
-    text-align:center;
-    margin-bottom:6px;
+  /* golden neon frame (casino style) */
+  .wrap.frame-on{box-shadow:0 12px 60px rgba(220,170,60,.14), inset 0 0 28px rgba(212,175,55,.06)}
+  .wrap::after{
+    content:"";position:absolute;inset:0;border-radius:18px;padding:2px;pointer-events:none;box-shadow:inset 0 0 40px rgba(212,175,55,0.02);transition:opacity .2s;
   }
-  header p{
-    text-align:center;
-    font-size:13px;
-    color:var(--muted);
-  }
+  /* blinking lights */
+  .gold-lights{position:absolute;inset:-6px;border-radius:22px;pointer-events:none;mix-blend-mode:screen;opacity:0.95}
+  .gold-lights .lamp{position:absolute;width:8px;height:8px;border-radius:4px;background:var(--gold);box-shadow:0 4px 12px rgba(212,175,55,.45);animation:lampBlink 2.2s infinite;}
+  @keyframes lampBlink{0%,100%{opacity:.35;transform:scale(.9)}50%{opacity:1;transform:scale(1.2)}}
 
-  .code-row{
-    margin-top:18px;
-    display:flex;gap:12px;flex-wrap:wrap;
-  }
-  input{
-    flex:1;
-    padding:12px 14px;
-    background:#0c141b;
-    color:#fff;border:none;
-    border-radius:10px;
-    font-weight:600;
-  }
-  .btn{
-    background:var(--gold);
-    color:#111;
-    border:none;
-    padding:11px 16px;
-    border-radius:10px;
-    font-weight:700;
-    cursor:pointer;
-  }
-  .btn:disabled{opacity:.5}
+  header{text-align:center}
+  header h1{font-size:22px;color:var(--gold);text-shadow:0 0 10px rgba(255,215,120,.08)}
+  header p{font-size:13px;color:var(--muted);margin-top:6px}
 
-  #status{
-    text-align:center;
-    width:100%;
-    margin-top:10px;
-    font-size:13px;
-    color:var(--muted);
-  }
+  /* code & status */
+  .row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center}
+  input[type="text"]{flex:1;padding:12px;border-radius:12px;border:none;background:#0b141b;color:#fff;font-weight:700}
+  .btn{background:linear-gradient(135deg,var(--gold),var(--accent));color:#111;padding:11px 16px;border-radius:12px;border:none;cursor:pointer;font-weight:800}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  #status{margin-top:10px;text-align:center;color:var(--muted);font-size:13px}
 
-  /* prize */
-  .prize-list{
-    margin-top:22px;
-    display:flex;
-    gap:12px;
-    flex-wrap:wrap;
-    justify-content:center;
-  }
-  .prize{
-    background:linear-gradient(135deg,#ff4e4e,#ffa94d,#4caf50);
-    padding:14px;width:46%;
-    min-width:160px;
-    text-align:center;
-    border-radius:14px;
-    color:#111;
-    font-weight:800;
-    font-size:16px;
-    border:2px solid rgba(255,255,255,0.12);
-    position:relative;
-    box-shadow:0 8px 25px rgba(0,0,0,.45);
-  }
-  .prize::before{
-    content:"🎄";
-    position:absolute;
-    top:-10px;left:12px;font-size:20px;
-  }
-  .prize small{
-    display:block;
-    margin-top:6px;
-    color:#222;
-    font-size:12px;
-  }
+  /* prizes */
+  .prize-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:18px}
+  .prize{background:linear-gradient(135deg,#ff6b6b,#ffcf6b,#64d56b);padding:12px;border-radius:12px;font-weight:800;text-align:center;color:#111;box-shadow:0 8px 26px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,0.08)}
+  .prize small{display:block;margin-top:6px;font-size:12px;color:#222}
 
-  /* kartu grid */
-  .grid{
-    margin-top:26px;
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:16px;
-  }
+  /* grid cards */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+  .card{height:150px;border-radius:12px;perspective:1100px;position:relative;cursor:pointer}
+  .card.locked{filter:grayscale(.3);cursor:not-allowed;opacity:.85}
+  .card-inner{width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d;border-radius:12px}
+  .card.flip .card-inner{transform:rotateY(180deg)}
+  .card-front,.card-back{position:absolute;inset:0;border-radius:12px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;padding:12px;font-weight:800;}
+  .card-front{background:var(--card-front);color:var(--muted);border:1px solid rgba(255,255,255,0.04)}
+  .card-back{background:linear-gradient(135deg,var(--card-back),#ffe08a);color:#111;transform:rotateY(180deg)}
 
-  .card{
-    height:150px;
-    perspective:1200px;
-    position:relative;
-    cursor:pointer;
-    border-radius:14px;
-  }
-  .card.locked{
-    filter:grayscale(.4);
-    cursor:not-allowed;
-    opacity:.85;
-  }
-
-  .card-inner{
-    width:100%;height:100%;
-    transition:transform .6s;
-    transform-style:preserve-3d;
-  }
-  .card.flip .card-inner{
-    transform:rotateY(180deg);
-  }
-  .card-front,.card-back{
-    position:absolute;inset:0;
-    display:flex;align-items:center;justify-content:center;
-    backface-visibility:hidden;
-    border-radius:14px;
-    font-weight:700;text-align:center;
-    padding:10px;
-  }
-  .card-front{
-    background:linear-gradient(180deg,#071018,#0c1115);
-    border:1px solid rgba(255,255,255,0.05);
-    color:var(--muted);
-  }
-  .card-back{
-    background:linear-gradient(135deg,#fff7cd,#ffd76f);
-    color:#111;
-    transform:rotateY(180deg);
-  }
-
-  /* result */
-  .result{
-    margin-top:18px;
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-    align-items:center;
-    font-size:13px;
-  }
+  /* result list */
+  .result{margin-top:18px;display:flex;flex-direction:column;gap:8px;align-items:center;font-size:13px}
   .result .small{color:var(--muted)}
 
-  /* confetti */
-  .confetti{
-    position:fixed;width:8px;height:8px;border-radius:2px;
-    pointer-events:none;
-    animation:confettiDrop 900ms linear forwards;
-    z-index:30;
-  }
-  @keyframes confettiDrop{
-    0%{transform:translateY(0) rotate(0);opacity:1}
-    100%{transform:translateY(180px) rotate(360deg);opacity:0}
-  }
+  /* modal */
+  .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:60;opacity:0;pointer-events:none;transition:opacity .18s}
+  .modal-back.show{opacity:1;pointer-events:auto}
+  .modal{background:#fff;padding:18px;border-radius:12px;max-width:420px;width:92%;box-shadow:0 18px 60px rgba(0,0,0,.6);color:#111}
+  .modal h3{margin-bottom:8px}
+  .modal p{margin-bottom:16px;color:#333}
+  .modal .modal-actions{display:flex;gap:8px;justify-content:flex-end}
+
+  /* music control */
+  .music-control{position:fixed;right:14px;bottom:14px;z-index:70;background:rgba(255,255,255,0.04);padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);display:flex;gap:8px;align-items:center}
+  .music-control button{background:transparent;border:none;color:var(--muted);cursor:pointer;font-weight:700}
+
+  /* lite mode adjustments */
+  .lite .gold-lights,.lite .tree,.lite .snow{display:none}
+  .lite .wrap{backdrop-filter:none;box-shadow:0 8px 20px rgba(0,0,0,.45)}
+  .lite .card{transition:none}.lite .card-inner{transition:none}
 
   @media(max-width:720px){
-    .prize{width:47%}
+    .grid{grid-template-columns:repeat(2,1fr)}
     .card{height:130px}
+    .wrap{padding:16px}
   }
 </style>
 </head>
-
 <body>
 
-<div class="dec" id="decContainer"></div>
-
-<main class="wrap">
-<header>
-  <h1>Event Tebak Kartu — Natal KASINOJP</h1>
-  <p>Masukkan kode dari admin, pilih 3 kartu — kode hanya sekali pakai.</p>
-</header>
-
-<div class="code-row">
-  <input id="codeInput" type="text" placeholder="Masukkan kode akses...">
-  <button id="verifyBtn" class="btn">Verify</button>
+<!-- controls -->
+<div class="controls">
+  <div class="toggle">
+    <span class="small-note">Frame</span>
+    <button id="toggleFrameBtn">On</button>
+  </div>
+  <div class="toggle">
+    <span class="small-note">Lights</span>
+    <button id="toggleLightsBtn">On</button>
+  </div>
+  <div class="toggle">
+    <span class="small-note">Lite Mode</span>
+    <button id="toggleLiteBtn">Off</button>
+  </div>
+  <div class="toggle">
+    <span class="small-note">Theme</span>
+    <button id="toggleThemeBtn">Gold</button>
+  </div>
 </div>
 
-<div id="status">Status: belum terkoneksi</div>
+<!-- main -->
+<div class="wrap frame-on" id="mainWrap" role="main" aria-live="polite">
+  <div class="gold-lights" id="goldLights" aria-hidden="true"></div>
 
-<div class="prize-list">
-  <div class="prize">🎁 PLATINUM <small>10,000</small></div>
-  <div class="prize">🎁 DIAMOND <small>25,000</small></div>
-  <div class="prize">🎁 SILVER DIAMOND <small>50,000</small></div>
-  <div class="prize">🎁 PERFECT DIAMOND <small>100,000</small></div>
-  <div class="prize">🎁 EPIC DIAMOND <small>150,000</small></div>
-  <div class="prize">🎁 MHYTIC DIAMOND <small>400,000</small></div>
+  <header>
+    <h1>✨ Tebak Kartu Natal — KASINOJP ✨</h1>
+    <p>Masukkan kode dari admin • Pilih maksimal 3 kartu • Kode hanya 1x</p>
+  </header>
+
+  <div class="row">
+    <input id="codeInput" type="text" placeholder="Masukkan kode akses...">
+    <button id="verifyBtn" class="btn">Verify</button>
+  </div>
+  <div id="status">Status: belum terkoneksi</div>
+
+  <div class="prize-list" aria-hidden="false">
+    <div class="prize">🎁 PLATINUM <small>10,000</small></div>
+    <div class="prize">🎁 DIAMOND <small>25,000</small></div>
+    <div class="prize">🎁 SILVER DIAMOND <small>50,000</small></div>
+    <div class="prize">🎁 PERFECT DIAMOND <small>100,000</small></div>
+    <div class="prize">🎁 EPIC DIAMOND <small>150,000</small></div>
+    <div class="prize">🎁 MYTHIC DIAMOND <small>400,000</small></div>
+  </div>
+
+  <section id="gridWrap" class="grid" aria-label="Area kartu"></section>
+
+  <div id="resultArea" class="result" aria-live="polite"></div>
 </div>
 
-<section id="gridWrap" class="grid"></section>
-<div id="resultArea" class="result"></div>
-</main>
+<!-- modal claim -->
+<div class="modal-back" id="modalBack" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal" role="document">
+    <h3>🎉 Selamat!</h3>
+    <p id="modalMsg">Kamu mendapatkan hadiah.</p>
+    <div class="modal-actions">
+      <button id="modalClose" class="btn">Tutup</button>
+      <button id="modalContact" class="btn">Hubungi Admin</button>
+    </div>
+  </div>
+</div>
+
+<!-- music control -->
+<div class="music-control" id="musicControl" title="Kontrol Musik">
+  <button id="playBtn">▶️ Play</button>
+  <button id="pauseBtn" style="display:none">⏸️ Pause</button>
+</div>
+
+<!-- decorative background container -->
+<div class="dec" id="decContainer" aria-hidden="true"></div>
+
+<!-- audio: place bgm.mp3 in same folder if you want background music -->
+<audio id="bgm" loop preload="auto">
+  <source src="bgm.mp3" type="audio/mpeg">
+  <!-- If you don't include bgm.mp3, the controls will be present but won't play -->
+</audio>
 
 <script type="module">
+/* ========== Firebase config (unchanged) ========== */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
@@ -262,192 +207,321 @@ const firebaseConfig={
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-
 const configRef = ref(db, "gameConfig/cards");
 
-const decContainer=document.getElementById('decContainer');
-const gridWrap=document.getElementById('gridWrap');
-const verifyBtn=document.getElementById('verifyBtn');
-const codeInput=document.getElementById('codeInput');
-const statusEl=document.getElementById('status');
-const resultArea=document.getElementById('resultArea');
+/* ========== Elements & state ========== */
+const decContainer = document.getElementById('decContainer');
+const gridWrap = document.getElementById('gridWrap');
+const verifyBtn = document.getElementById('verifyBtn');
+const codeInput = document.getElementById('codeInput');
+const statusEl = document.getElementById('status');
+const resultArea = document.getElementById('resultArea');
+const modalBack = document.getElementById('modalBack');
+const modalMsg = document.getElementById('modalMsg');
+const modalClose = document.getElementById('modalClose');
+const modalContact = document.getElementById('modalContact');
+const playBtn = document.getElementById('playBtn');
+const pauseBtn = document.getElementById('pauseBtn');
+const bgm = document.getElementById('bgm');
 
-let serverConfig=null;
-let unlocked=false;
-let revealed=new Set();
-let selectedCount=0;
-const maxSelect=3;
+const toggleFrameBtn = document.getElementById('toggleFrameBtn');
+const toggleLightsBtn = document.getElementById('toggleLightsBtn');
+const toggleLiteBtn = document.getElementById('toggleLiteBtn');
+const toggleThemeBtn = document.getElementById('toggleThemeBtn');
+const mainWrap = document.getElementById('mainWrap');
+const goldLights = document.getElementById('goldLights');
 
-/* background anim */
-function spawnTree(){
-  const t=document.createElement('div');
-  t.className='tree';
-  t.style.left=(Math.random()*100)+'vw';
-  t.style.animationDuration=(7+Math.random()*6)+'s';
+let serverConfig = null;
+let unlocked = false;
+let revealed = new Set();
+let selectedCount = 0;
+const maxSelect = 3;
+let lightsOn = true;
+let frameOn = true;
+let liteMode = false;
+
+/* ========== Build gold lights positions ========== */
+function createGoldLights(){
+  goldLights.innerHTML = '';
+  const positions = [
+    {left:'8px', top:'6px'}, {left:'40px', top:'6px'}, {left:'80px', top:'6px'},
+    {left:'120px', top:'6px'}, {left:'160px', top:'6px'}, {left:'200px', top:'6px'},
+    {left:'240px', top:'6px'}, {left:'280px', top:'6px'}, {left:'320px', top:'6px'},
+    {left:'360px', top:'6px'}
+  ];
+  positions.forEach((p,i)=>{
+    const el = document.createElement('div');
+    el.className = 'lamp';
+    el.style.left = p.left;
+    el.style.top = p.top;
+    el.style.animationDelay = (i*0.12)+'s';
+    goldLights.appendChild(el);
+  });
+}
+createGoldLights();
+
+/* ========== Background decorations (trees & snow) ========== */
+function spawnTree(){ if(liteMode) return;
+  const t = document.createElement('div');
+  t.className = 'tree';
+  t.style.left = (Math.random()*100)+'vw';
+  t.style.animationDuration = (6 + Math.random()*8) + 's';
   decContainer.appendChild(t);
-  setTimeout(()=>t.remove(),15000);
+  setTimeout(()=>t.remove(),16000);
 }
-function spawnSnow(){
-  const s=document.createElement('div');
-  s.className='snow';
-  s.style.left=(Math.random()*100)+'vw';
-  s.style.animationDuration=(3+Math.random()*6)+'s';
+function spawnSnow(){ if(liteMode) return;
+  const s = document.createElement('div');
+  s.className = 'snow';
+  s.style.left = (Math.random()*100)+'vw';
+  s.style.animationDuration = (3 + Math.random()*6) + 's';
   decContainer.appendChild(s);
-  setTimeout(()=>s.remove(),9000);
+  setTimeout(()=>s.remove(),10000);
 }
-setInterval(spawnTree,900);
-setInterval(spawnSnow,140);
+setInterval(spawnTree,900); setInterval(spawnSnow,140);
 
-/* Build Grid */
+/* ========== Grid builder ========== */
 function buildGrid(){
   gridWrap.innerHTML='';
   for(let i=0;i<9;i++){
-    const c=document.createElement('div');
-    c.className='card locked';
-    c.dataset.index=i;
-    c.innerHTML=`
-      <div class="card-inner">
-        <div class="card-front">Kartu ${i+1}</div>
-        <div class="card-back"><span class="label">?</span></div>
-      </div>`;
-    c.addEventListener('click',onCardClick);
+    const c = document.createElement('div');
+    c.className = 'card locked';
+    c.dataset.index = i;
+    c.innerHTML = `<div class="card-inner">
+      <div class="card-front">Kartu ${i+1}</div>
+      <div class="card-back"><span class="label">?</span></div>
+    </div>`;
+    c.addEventListener('click', onCardClick);
     gridWrap.appendChild(c);
   }
 }
+buildGrid();
 
-/* status */
-function setStatus(txt,ok=true){
-  statusEl.textContent='Status: '+txt;
-  statusEl.style.color=ok?'var(--muted)':'#ff8f8f';
+/* ========== Status helper ========== */
+function setStatus(txt, ok=true){
+  statusEl.textContent = 'Status: ' + txt;
+  statusEl.style.color = ok ? 'var(--muted)' : '#ff8f8f';
 }
 
-/* load config */
-onValue(configRef,snap=>{
+/* ========== Load config from Firebase ========== */
+onValue(configRef, snap => {
   if(snap.exists()){
-    serverConfig=snap.val();
+    serverConfig = snap.val();
     setStatus('Siap — data tersedia 🎁');
     if(!unlocked) buildGrid();
-  }else{
-    serverConfig=null;
-    setStatus('Belum ada konfigurasi admin',false);
+  } else {
+    serverConfig = null;
+    setStatus('Belum ada konfigurasi admin', false);
     buildGrid();
   }
 });
 
-/* verify code */
+/* ========== Verify code ========== */
 async function verifyCode(code){
   try{
-    const usedSnap=await get(ref(db,"gameConfig/usedCodes/"+code));
-    if(usedSnap.exists()) return {ok:false,msg:"Kode sudah dipakai"};
-    if(!serverConfig) return {ok:false,msg:"Tidak ada data admin"};
-    if(code !== (serverConfig.code||'')) return{ok:false,msg:"Kode salah"};
-    return {ok:true,msg:"Kode valid"};
+    const usedSnap = await get(ref(db, "gameConfig/usedCodes/" + code));
+    if(usedSnap.exists()) return {ok:false, msg:"Kode sudah dipakai"};
+    if(!serverConfig) return {ok:false, msg:"Tidak ada konfigurasi admin"};
+    if(code !== (serverConfig.code||'')) return {ok:false, msg:"Kode salah"};
+    return {ok:true, msg:"Kode valid"};
   }catch(err){
-    return{ok:false,msg:"Error verifikasi"};
+    console.error(err);
+    return {ok:false, msg:"Error verifikasi"};
   }
 }
 
-/* card click */
+/* ========== Card click handler ========== */
 async function onCardClick(e){
   if(!unlocked) return;
-  if(selectedCount>=maxSelect) return;
+  if(selectedCount >= maxSelect) return;
 
-  const el=e.currentTarget;
-  const idx=Number(el.dataset.index);
+  const el = e.currentTarget;
+  const idx = Number(el.dataset.index);
   if(revealed.has(idx)) return;
 
-  const cardsArr=serverConfig?.cards||[];
-  let val=cardsArr[idx]||'Kosong';
+  const cardsArr = serverConfig?.cards || [];
+  let val = cardsArr[idx] || 'Kosong';
 
-  if(selectedCount>0 && val!==cardsArr[0]) val='ZONK';
+  if(selectedCount > 0 && val !== cardsArr[0]) val = 'ZONK';
 
   el.classList.add('flip');
-  el.querySelector('.label').textContent=val;
+  el.querySelector('.label').textContent = val;
 
   revealed.add(idx);
   selectedCount++;
 
-  const msg=document.createElement('div');msg.className='small';
-  msg.textContent=`Kartu ${idx+1}: ${val}`;
+  const msg = document.createElement('div');
+  msg.className = 'small';
+  msg.textContent = `Kartu ${idx+1}: ${val}`;
   resultArea.prepend(msg);
 
-  if(["Platinum","Diamond","Super Diamond"].includes(val)){
-    const r=el.getBoundingClientRect();
-    spawnConfetti(r.left+r.width/2,r.top+r.height/2);
+  if(["Platinum","Diamond","Super Diamond","PLATINUM","DIAMOND"].includes(val)){
+    const r = el.getBoundingClientRect();
+    spawnConfetti(r.left + r.width/2, r.top + r.height/2);
+    // show modal for big prizes
+    showModal(`Selamat! Kamu mendapatkan: ${val}. Silakan hubungi admin untuk claim.`);
   }
 
-  if(selectedCount>=maxSelect){
+  if(selectedCount >= maxSelect){
     await saveUsedCode();
-    document.querySelectorAll('.card').forEach(c=>c.classList.add('locked'));
-    const done=document.createElement('div');
-    done.className='small';
-    done.textContent='🎉 Hadiah keluar! Hubungi admin untuk claim.';
+    document.querySelectorAll('.card').forEach(c => c.classList.add('locked'));
+    const done = document.createElement('div');
+    done.className = 'small';
+    done.textContent = '🎉 Pilihan selesai — Hadiah keluar. Hubungi admin untuk claim.';
     resultArea.prepend(done);
   }
 }
 
-/* confetti */
+/* ========== Confetti effect ========== */
 function spawnConfetti(x,y){
   for(let i=0;i<20;i++){
-    const el=document.createElement('div');
-    el.className='confetti';
-    el.style.left=(x+(Math.random()*80-40))+'px';
-    el.style.top=(y+(Math.random()*40-20))+'px';
-    el.style.background=['#ffe9a3','#ff4d4d','#4caf50','#ffffff'][Math.floor(Math.random()*4)];
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = (x + (Math.random()*80 - 40)) + 'px';
+    el.style.top = (y + (Math.random()*40 - 20)) + 'px';
+    el.style.background = ['#ffe9a3','#ff6b6b','#4cd07b','#ffffff'][Math.floor(Math.random()*4)];
     document.body.appendChild(el);
     setTimeout(()=>el.remove(),900);
   }
 }
 
-/* save used code */
+/* ========== Save used code ========== */
 async function saveUsedCode(){
-  const code=codeInput.value.trim();
-  if(!code){setStatus('Kode kosong',false);return;}
-
+  const code = codeInput.value.trim();
+  if(!code){ setStatus('Masukkan kode sebelum menyimpan', false); return; }
+  if(!serverConfig){ setStatus('Tidak ada konfigurasi admin', false); return; }
   try{
-    const snap=await get(ref(db,"gameConfig/usedCodes/"+code));
-    if(snap.exists()){setStatus('Kode sudah dipakai',false);return;}
+    const snap = await get(ref(db, "gameConfig/usedCodes/" + code));
+    if(snap.exists()){ setStatus('Kode sudah dipakai', false); return; }
 
-    const cardsResult=[...gridWrap.querySelectorAll('.card')]
-      .map(c=>c.classList.contains('flip')?c.querySelector('.label').textContent:null);
+    const cardsResult = Array.from(gridWrap.querySelectorAll('.card'))
+      .map(c => c.classList.contains('flip') ? c.querySelector('.label').textContent : null);
 
-    await set(ref(db,"gameConfig/usedCodes/"+code),{
-      cards:cardsResult,
-      time:Date.now(),
-      used:true
+    await set(ref(db, "gameConfig/usedCodes/" + code), {
+      cards: cardsResult,
+      time: Date.now(),
+      used: true
     });
 
-    setStatus('Tersimpan ✓');
-    unlocked=false;
-    verifyBtn.disabled=true;
-    codeInput.disabled=true;
+    setStatus('Kode & kartu tersimpan ✓');
+    unlocked = false;
+    verifyBtn.disabled = true;
+    codeInput.disabled = true;
   }catch(err){
-    setStatus('Gagal menyimpan',false);
+    console.error(err);
+    setStatus('Gagal menyimpan', false);
   }
 }
 
-/* verify btn */
-verifyBtn.addEventListener('click',async()=>{
-  const code=codeInput.value.trim();
-  if(!code){setStatus('Masukkan kode',false);return;}
+/* ========== Verify button ========== */
+verifyBtn.addEventListener('click', async () => {
+  const code = codeInput.value.trim();
+  if(!code){ setStatus('Masukkan kode', false); return; }
   setStatus('Memeriksa...');
-  verifyBtn.disabled=true;
+  verifyBtn.disabled = true;
+  const res = await verifyCode(code);
+  verifyBtn.disabled = false;
+  if(!res.ok){ setStatus(res.msg, false); unlocked = false; return; }
 
-  const res=await verifyCode(code);
-  verifyBtn.disabled=false;
-
-  if(!res.ok){setStatus(res.msg,false);unlocked=false;return;}
-
-  unlocked=true;
-  selectedCount=0;
+  unlocked = true;
+  selectedCount = 0;
   revealed.clear();
   buildGrid();
-  setStatus('Kode valid — pilih 3 kartu 🎁');
+  setStatus('Kode valid — pilih sampai 3 kartu 🎁');
 });
 
-/* init */
-buildGrid();
-</script>
+/* ========== Modal helper ========== */
+function showModal(msg){
+  modalMsg.textContent = msg;
+  modalBack.classList.add('show');
+  modalBack.setAttribute('aria-hidden','false');
+}
+function hideModal(){
+  modalBack.classList.remove('show');
+  modalBack.setAttribute('aria-hidden','true');
+}
+modalClose.addEventListener('click', hideModal);
+modalContact.addEventListener('click', ()=> {
+  // Ganti link/aksi ini sesuai channel admin (WA/Telegram/URL)
+  window.open('https://wa.me/6281234567890', '_blank');
+});
 
+/* ========== Music controls (browser-safe) ========== */
+// Behavior:
+// - Autoplay unmuted is blocked by browsers, so we provide Play button.
+// - Put a file named "bgm.mp3" in same folder OR update <audio> src.
+playBtn.addEventListener('click', async () => {
+  try{
+    await bgm.play();
+    playBtn.style.display = 'none';
+    pauseBtn.style.display = '';
+  }catch(err){
+    console.warn('Audio play blocked or missing source', err);
+    setStatus('Musik tidak tersedia atau diblokir oleh browser', false);
+  }
+});
+pauseBtn.addEventListener('click', () => {
+  bgm.pause();
+  pauseBtn.style.display = 'none';
+  playBtn.style.display = '';
+});
+
+/* ========== Toggles: Frame / Lights / Lite / Theme ========== */
+toggleFrameBtn.addEventListener('click', ()=>{
+  frameOn = !frameOn;
+  if(frameOn){
+    mainWrap.classList.add('frame-on');
+    toggleFrameBtn.textContent = 'On';
+  } else {
+    mainWrap.classList.remove('frame-on');
+    toggleFrameBtn.textContent = 'Off';
+  }
+});
+
+toggleLightsBtn.addEventListener('click', ()=>{
+  lightsOn = !lightsOn;
+  if(lightsOn){
+    goldLights.style.display = '';
+    toggleLightsBtn.textContent = 'On';
+  } else {
+    goldLights.style.display = 'none';
+    toggleLightsBtn.textContent = 'Off';
+  }
+});
+
+toggleLiteBtn.addEventListener('click', ()=>{
+  liteMode = !liteMode;
+  if(liteMode){
+    document.documentElement.classList.add('lite');
+    toggleLiteBtn.textContent = 'On';
+  } else {
+    document.documentElement.classList.remove('lite');
+    toggleLiteBtn.textContent = 'Off';
+  }
+});
+
+toggleThemeBtn.addEventListener('click', ()=>{
+  // Switch between gold theme and red theme for quick flavor
+  if(toggleThemeBtn.textContent === 'Gold'){
+    document.documentElement.style.setProperty('--gold','#ffb3b3');
+    document.documentElement.style.setProperty('--gold-strong','#ff6b6b');
+    toggleThemeBtn.textContent = 'Red';
+  } else {
+    document.documentElement.style.setProperty('--gold','#ffe9a3');
+    document.documentElement.style.setProperty('--gold-strong','#d4af37');
+    toggleThemeBtn.textContent = 'Gold';
+  }
+});
+
+/* ========== Accessibility: keyboard modal close ========== */
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape') hideModal();
+});
+
+/* ========== Init: add a few decorative lamps positions (responsive) ========== */
+(function placeLights(){
+  // positions already created in createGoldLights()
+})();
+
+</script>
 </body>
 </html>
