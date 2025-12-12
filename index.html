@@ -126,6 +126,7 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px #ffef9f inset;}
   border-radius:12px;
   perspective:1100px;
   cursor:pointer;
+  position:relative;
 }
 .card.locked{filter:grayscale(.2);cursor:not-allowed;opacity:.85}
 .card-inner{width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d;border-radius:12px}
@@ -141,12 +142,40 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px #ffef9f inset;}
   background:linear-gradient(135deg,#ffd966,#ffe079);
   color:#111;
   box-shadow:0 4px 8px rgba(0,0,0,.3);
+  position:relative;
 }
 .card-back{
   background:linear-gradient(135deg,#fff7d0,#ffd87a);
   color:#111;
   transform:rotateY(180deg);
   box-shadow:0 4px 8px rgba(0,0,0,.3);
+}
+
+/* lampu keliling kartu */
+.card-front::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:12px;
+  pointer-events:none;
+  box-shadow:0 0 3px 2px #ffef9f;
+}
+.card-lights{
+  position:absolute;
+  inset:0;
+  border-radius:12px;
+  pointer-events:none;
+}
+.card-lights div{
+  width:6px;height:6px;border-radius:50%;
+  position:absolute;
+  background:#ffe079;
+  opacity:0.3;
+  animation:cardBlink 2s infinite;
+}
+@keyframes cardBlink{
+  0%,100%{opacity:0.3}
+  50%{opacity:1; transform:scale(1.3)}
 }
 
 .result{margin-top:16px;display:flex;flex-direction:column;gap:6px;align-items:center;font-size:13px}
@@ -226,11 +255,29 @@ function buildGrid(){
     c.dataset.index=i;
     c.innerHTML=`
       <div class="card-inner">
-        <div class="card-front">Kartu ${i+1}</div>
+        <div class="card-front">Kartu ${i+1}
+          <div class="card-lights"></div>
+        </div>
         <div class="card-back"><span class="label">?</span></div>
       </div>`;
     c.addEventListener('click',onCardClick);
     gridWrap.appendChild(c);
+
+    // tambahkan lampu keliling kartu
+    const lightsContainer = c.querySelector('.card-lights');
+    const positions=[
+      [2,2],[50,2],[calc(100%-2px),2],
+      [calc(100%-2px),50],[calc(100%-2px),calc(100%-2px)],
+      [50,calc(100%-2px)],[2,calc(100%-2px)],[2,50]
+    ];
+    for(let j=0;j<8;j++){
+      const l=document.createElement('div');
+      const pos=positions[j];
+      l.style.top=(typeof pos[0]==='number'?pos[0]+'%':pos[0]);
+      l.style.left=(typeof pos[1]==='number'?pos[1]+'%':pos[1]);
+      l.style.animationDelay=(j*0.2)+'s';
+      lightsContainer.appendChild(l);
+    }
   }
 }
 
