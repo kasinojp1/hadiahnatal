@@ -36,7 +36,7 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
 .btn:disabled{opacity:.6; cursor:not-allowed;}
 #status{margin-top:5px; font-size:13px; color:var(--muted); text-align:center;}
 
-/* Prize List - tema Natal */
+/* Prize List - warna merah Natal */
 .prize-section{margin-bottom:40px;}
 .prize-list{display:flex; flex-wrap:wrap; gap:12px; justify-content:center;}
 .prize{
@@ -44,7 +44,7 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
   min-width:160px;
   padding:16px;
   border-radius:16px;
-  background:linear-gradient(135deg,#d62828,#f77f00,#ffd166,#06d6a0); /* Merah, Oranye, Emas, Hijau */
+  background:linear-gradient(135deg,#d62828,#f94144,#ff6b6b,#ffd166); /* dominan merah */
   color:#111;
   font-weight:800;
   text-align:center;
@@ -79,7 +79,7 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
 .dec .tree{position:absolute; width:36px; height:52px; background:linear-gradient(#0a7b1f,#00c04a); clip-path:polygon(50% 0,0 100%,100% 100%); opacity:.75; filter:drop-shadow(0 6px 14px rgba(0,0,0,.6)); animation:treeFall linear infinite;}
 @keyframes treeFall{0%{transform:translateY(-80px) scale(.6);opacity:.7}100%{transform:translateY(110vh) scale(1);opacity:0}}
 .dec .snow{position:absolute;width:8px;height:8px;background:#fff;border-radius:50%;opacity:.85;animation:snowFall linear infinite;}
-@keyframes snowFall{0%{transform:translateY(-10px)}100%{transform:translateY(110vh)}}
+@keyframes snowFall{0%{transform:translateY(-10px)}100%{transform:translateY(110vh}}
 
 /* Confetti */
 .confetti{position:fixed;width:8px;height:8px;border-radius:2px; pointer-events:none; animation:confettiDrop 900ms linear forwards; z-index:20;}
@@ -184,7 +184,8 @@ function setStatus(txt, ok=true){
 }
 
 onValue(configRef,snap=>{
-  if(snap.exists()){serverConfig=snap.val();setStatus('Siap — data tersedia 🎁');if(!unlocked) buildGrid();}else{serverConfig=null;setStatus('Belum ada konfigurasi admin',false);buildGrid();}
+  if(snap.exists()){serverConfig=snap.val();setStatus('Siap — data tersedia 🎁');if(!unlocked) buildGrid();}
+  else{serverConfig=null;setStatus('Belum ada konfigurasi admin',false);buildGrid();}
 });
 
 async function verifyCode(code){
