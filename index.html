@@ -8,101 +8,30 @@
 <style>
 body {
   font-family: 'Poppins', sans-serif;
-  background: linear-gradient(180deg, #071229, #0c1624);
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
+  background: linear-gradient(180deg,#071229,#0c1624);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:20px;
 }
-h1 {
-  background: linear-gradient(90deg,#ffef9f,#d4af37);
-  -webkit-background-clip:text;
-  color: transparent;
-  font-size: 28px;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-/* Input dan tombol */
+h1 {font-size:28px;text-align:center;margin-bottom:20px;background: linear-gradient(90deg,#ffef9f,#d4af37);-webkit-background-clip:text;color:transparent;}
 .input-row {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  display:flex; gap:10px; margin-bottom:20px;
 }
 input[type="text"] {
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: none;
-  font-weight: 600;
-  flex: 1;
+  padding:12px 16px; border-radius:12px; border:none; font-weight:600; flex:1;
 }
 button {
-  padding: 12px 18px;
-  border-radius: 12px;
-  border: none;
-  background: #ffef9f;
-  color: #111;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.3s;
+  padding:12px 18px; border-radius:12px; border:none; background:#ffef9f; color:#111; font-weight:700; cursor:pointer;
 }
 button:hover {background:#ffd966;}
 button:disabled {opacity:0.6; cursor:not-allowed;}
-
-/* Roda */
-.wheel-container {
-  position: relative;
-  width: 300px;
-  height: 300px;
-  margin-bottom: 20px;
-}
-.wheel {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 8px solid #ffd966;
-  position: relative;
-  overflow: hidden;
-  transition: transform 5s cubic-bezier(0.25, 1, 0.5, 1);
-}
-.segment {
-  position: absolute;
-  width: 50%;
-  height: 50%;
-  top: 50%;
-  left: 50%;
-  transform-origin: 0% 0%;
-  border-top-right-radius: 300px;
-  color: #111;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-start;
-  padding: 10px;
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.4);
-}
-
-/* Penanda atas */
-.pointer {
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-bottom: 20px solid #ffef9f;
-}
-
-/* Hasil */
-#result {
-  margin-top: 20px;
-  font-size: 18px;
-  font-weight: 700;
-  text-align: center;
-}
+.wheel-container {position:relative;width:300px;height:300px;margin-bottom:20px;}
+.wheel {width:100%;height:100%;border-radius:50%;border:8px solid #ffd966;position:relative;overflow:hidden;transition:transform 5s cubic-bezier(0.25,1,0.5,1);}
+.segment {position:absolute;width:50%;height:50%;top:50%;left:50%;transform-origin:0% 0%;border-top-right-radius:300px;color:#111;display:flex;align-items:flex-end;justify-content:flex-start;padding:10px;font-weight:700;text-shadow:0 2px 4px rgba(0,0,0,0.4);}
+.pointer {position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:20px solid #ffef9f;}
+#result {margin-top:20px;font-size:18px;font-weight:700;text-align:center;}
 </style>
 </head>
 <body>
@@ -110,7 +39,7 @@ button:disabled {opacity:0.6; cursor:not-allowed;}
 <h1>Roda Hadiah — Natal KASINOJP</h1>
 
 <div class="input-row">
-  <input type="text" id="voucherInput" placeholder="Masukkan kode voucher...">
+  <input type="text" id="voucherInput" placeholder="Masukkan kode voucher">
   <button id="spinBtn">Putar Roda</button>
 </div>
 
@@ -125,7 +54,6 @@ button:disabled {opacity:0.6; cursor:not-allowed;}
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
-// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDlpuf_uIlpmr2ybAqpJ2GTTRW-t86PGf0",
   authDomain: "hadiahnatal-a033b.firebaseapp.com",
@@ -145,67 +73,55 @@ const spinBtn = document.getElementById('spinBtn');
 const voucherInput = document.getElementById('voucherInput');
 const resultEl = document.getElementById('result');
 
-let segments = [];
+let prizes = [];
 let spinning = false;
 
-// Ambil hadiah dari Firebase
-const prizesRef = ref(db, 'gameConfig/prizes');
-onValue(prizesRef, snap => {
-  if(snap.exists()) {
-    segments = snap.val();
-    createWheel();
+// --- Ambil daftar hadiah realtime ---
+const prizesRef = ref(db,'gameConfig/prizes');
+onValue(prizesRef,snap=>{
+  if(snap.exists()){
+    prizes = snap.val();
+    renderWheel();
   }
 });
 
-// Buat segmen roda
-function createWheel() {
+// --- Buat segmen roda ---
+function renderWheel(){
   wheel.innerHTML='';
   const colors = ['#ff6b6b','#ff9f1c','#06d6a0','#1b9aaa','#9d4edd','#ffd166','#f94144'];
-  const angle = 360 / segments.length;
-  segments.forEach((text,i)=>{
+  const angle = 360 / prizes.length;
+  prizes.forEach((p,i)=>{
     const seg = document.createElement('div');
-    seg.className='segment';
-    seg.textContent=text;
-    seg.style.transform=`rotate(${i*angle}deg) skewY(-${90-angle}deg)`;
-    seg.style.background=colors[i % colors.length];
+    seg.className = 'segment';
+    seg.textContent = p;
+    seg.style.transform = `rotate(${i*angle}deg) skewY(-${90-angle}deg)`;
+    seg.style.background = colors[i % colors.length];
     wheel.appendChild(seg);
   });
 }
 
-// Fungsi spin
+// --- Spin roda setelah cek voucher ---
 spinBtn.addEventListener('click', async ()=>{
   const code = voucherInput.value.trim();
-  if(!code){alert('Masukkan kode voucher!'); return;}
+  if(!code){alert('Masukkan voucher'); return;}
   if(spinning) return;
+
+  const voucherRef = ref(db,'gameConfig/vouchers/'+code);
+  const snap = await get(voucherRef);
+  if(!snap.exists()){alert('Voucher tidak valid'); return;}
+
   spinning = true;
+  const winnerIndex = Math.floor(Math.random() * prizes.length);
+  const angle = 360 / prizes.length;
+  const rotation = 360*5 + winnerIndex*angle + angle/2;
 
-  const voucherSnap = await get(ref(db, 'gameConfig/vouchers/'+code));
-  if(!voucherSnap.exists()){
-    alert('Voucher tidak valid!');
-    spinning = false;
-    return;
-  }
+  wheel.style.transition = 'transform 5s cubic-bezier(0.25,1,0.5,1)';
+  wheel.style.transform = `rotate(${rotation}deg)`;
 
-  const usedSnap = await get(ref(db, 'gameConfig/usedVouchers/'+code));
-  if(usedSnap.exists()){
-    alert('Voucher sudah digunakan!');
-    spinning = false;
-    return;
-  }
-
-  const winnerIndex = Math.floor(Math.random() * segments.length);
-  const angle = 360 / segments.length;
-  const rotation = 360*5 + (winnerIndex*angle) + angle/2;
-
-  wheel.style.transition='transform 5s cubic-bezier(0.25,1,0.5,1)';
-  wheel.style.transform=`rotate(${rotation}deg)`;
-
+  // Setelah selesai animasi, hapus voucher agar tidak bisa dipakai lagi
   setTimeout(async ()=>{
-    const prize = segments[winnerIndex];
-    resultEl.textContent=`Selamat! Kamu mendapatkan: ${prize}`;
-
-    // Tandai voucher sudah dipakai
-    await set(ref(db,'gameConfig/usedVouchers/'+code), {prize, time:Date.now()});
+    resultEl.textContent = `Selamat! Kamu mendapatkan: ${prizes[winnerIndex]}`;
+    await set(voucherRef, {used:true, won:prizes[winnerIndex]});
     spinning = false;
   },5200);
 });
