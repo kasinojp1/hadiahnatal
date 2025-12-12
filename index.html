@@ -10,11 +10,11 @@
 :root{
   --bg1:#040816;
   --bg2:#0a1220;
-  --gold:#ffe9a3;
-  --accent:#ff7b3a;
+  --gold:#ffe079;
+  --accent:#ffcf6b;
   --muted:#bcc3c8;
-  --card-front:#0f1720;
-  --card-back:#fff6d8;
+  --card-front:#ffd966;
+  --card-back:#fff1b8;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -36,10 +36,11 @@ body{
   border:1px solid rgba(255,255,255,0.06);
   box-shadow:0 12px 48px rgba(0,0,0,.6);
   position:relative;
+  overflow:hidden;
 }
 
 header{text-align:center}
-header h1{font-size:22px;color:var(--gold);text-shadow:0 0 10px rgba(255,215,120,.08)}
+header h1{font-size:22px;color:var(--gold);text-shadow:0 0 10px rgba(255,215,120,.2)}
 header p{font-size:13px;color:var(--muted);margin-top:6px}
 
 /* Input kode dengan lampu kelap-kelip */
@@ -53,7 +54,7 @@ header p{font-size:13px;color:var(--muted);margin-top:6px}
   border-radius:12px;
   border:none;
   background:#0b141b;
-  color:#fff;
+  color:#111;
   font-weight:700;
   z-index:2;
   position:relative;
@@ -71,7 +72,7 @@ header p{font-size:13px;color:var(--muted);margin-top:6px}
   width:6px;
   height:6px;
   border-radius:50%;
-  background:#ffe9a3;
+  background:#ffe079;
   box-shadow:0 0 6px #ffef9f,0 0 10px #ffef9f inset;
   animation:blink 1.5s infinite alternate;
 }
@@ -108,7 +109,7 @@ header p{font-size:13px;color:var(--muted);margin-top:6px}
   margin-top:18px;
 }
 .prize{
-  background:linear-gradient(135deg,#ff6b6b,#ffcf6b,#64d56b);
+  background:linear-gradient(135deg,#ffcc6b,#ffd966,#ffe079);
   padding:12px;
   border-radius:12px;
   font-weight:800;
@@ -120,7 +121,32 @@ header p{font-size:13px;color:var(--muted);margin-top:6px}
 .prize small{display:block;margin-top:6px;font-size:12px;color:#222}
 
 /* grid cards */
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:20px;
+  position:relative;
+  overflow:hidden;
+  background:#0b141b;
+  border-radius:14px;
+  padding:12px;
+}
+.grid .grid-light{
+  position:absolute;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#ffe079;
+  opacity:0.5;
+  animation:lightMove 3s linear infinite;
+}
+@keyframes lightMove{
+  0%{transform:translate(0,0)}
+  50%{transform:translate(100%,100%)}
+  100%{transform:translate(0,0)}
+}
+
 .card{height:140px;border-radius:12px;perspective:1100px;position:relative;cursor:pointer}
 .card.locked{filter:grayscale(.3);cursor:not-allowed;opacity:.85}
 .card-inner{width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d;border-radius:12px}
@@ -128,14 +154,15 @@ header p{font-size:13px;color:var(--muted);margin-top:6px}
 .card-front,.card-back{
   position:absolute;inset:0;border-radius:12px;
   display:flex;align-items:center;justify-content:center;
-  backface-visibility:hidden;padding:12px;font-weight:800;
+  backface-visibility:hidden;padding:12px;font-weight:800;text-align:center;
 }
-.card-front{background:var(--card-front);color:var(--muted);border:1px solid rgba(255,255,255,0.04)}
-.card-back{background:linear-gradient(135deg,var(--card-back),#ffe08a);color:#111;transform:rotateY(180deg)}
+.card-front{background:linear-gradient(135deg,#ffd966,#ffe079);color:#111;box-shadow:0 4px 8px rgba(0,0,0,.3)}
+.card-back{background:linear-gradient(135deg,#fff1b8,#ffe9a3);color:#111;transform:rotateY(180deg);box-shadow:0 4px 8px rgba(0,0,0,.3)}
 
 .result{margin-top:18px;display:flex;flex-direction:column;gap:8px;align-items:center;font-size:13px}
 .result .small{color:var(--muted)}
 
+/* modal claim */
 .modal-back{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:60;opacity:0;pointer-events:none;transition:opacity .18s}
 .modal-back.show{opacity:1;pointer-events:auto}
 .modal{background:#fff;padding:18px;border-radius:12px;max-width:420px;width:92%;box-shadow:0 18px 60px rgba(0,0,0,.6);color:#111}
@@ -238,7 +265,7 @@ let revealed=new Set();
 let selectedCount=0;
 const maxSelect=3;
 
-/* ==== Lights around input ==== */
+/* Lights around input */
 for(let i=0;i<12;i++){
   const l=document.createElement('div');
   l.style.top=Math.random()*100+'%';
@@ -247,14 +274,24 @@ for(let i=0;i<12;i++){
   lightsContainer.appendChild(l);
 }
 
-/* ==== Decorations ==== */
+/* Background grid lights */
+for(let i=0;i<20;i++){
+  const gl=document.createElement('div');
+  gl.className='grid-light';
+  gl.style.top=Math.random()*100+'%';
+  gl.style.left=Math.random()*100+'%';
+  gl.style.animationDuration=(2+Math.random()*2)+'s';
+  gridWrap.appendChild(gl);
+}
+
+/* Decorations */
 function spawnTree(){ const t=document.createElement('div'); t.className='tree'; t.style.left=(Math.random()*100)+'vw'; decContainer.appendChild(t); setTimeout(()=>t.remove(),16000);}
 function spawnSnow(){ const s=document.createElement('div'); s.className='snow'; s.style.left=(Math.random()*100)+'vw'; decContainer.appendChild(s); setTimeout(()=>s.remove(),10000);}
 setInterval(spawnTree,900); setInterval(spawnSnow,140);
 
-/* ==== Grid ==== */
+/* Grid cards */
 function buildGrid(){
-  gridWrap.innerHTML='';
+  gridWrap.querySelectorAll('.card').forEach(c=>c.remove());
   for(let i=0;i<9;i++){
     const c=document.createElement('div');
     c.className='card locked';
@@ -303,7 +340,7 @@ async function onCardClick(e){
   if(selectedCount>=maxSelect){await saveUsedCode();document.querySelectorAll('.card').forEach(c=>c.classList.add('locked'));}
 }
 
-function spawnConfetti(x,y){for(let i=0;i<20;i++){const el=document.createElement('div');el.className='confetti';el.style.left=(x+(Math.random()*80-40))+'px';el.style.top=(y+(Math.random()*40-20))+'px';el.style.background=['#ffe9a3','#ff6b6b','#4cd07b','#ffffff'][Math.floor(Math.random()*4)];document.body.appendChild(el);setTimeout(()=>el.remove(),900);}}
+function spawnConfetti(x,y){for(let i=0;i<20;i++){const el=document.createElement('div');el.className='confetti';el.style.left=(x+(Math.random()*80-40))+'px';el.style.top=(y+(Math.random()*40-20))+'px';el.style.background=['#ffe079','#ff6b6b','#ffd966','#ffffff'][Math.floor(Math.random()*4)];document.body.appendChild(el);setTimeout(()=>el.remove(),900);}}
 
 async function saveUsedCode(){const code=(codeInput.value||'').trim();if(!code){setStatus('Masukkan kode sebelum menyimpan',false);return;} if(!serverConfig){setStatus('Tidak ada konfigurasi admin',false);return;} try{const snap=await get(ref(db,"gameConfig/usedCodes/"+code));if(snap.exists()){setStatus('Kode sudah dipakai',false);return;} const cardsResult=Array.from(gridWrap.querySelectorAll('.card')).map(c=>c.classList.contains('flip')?c.querySelector('.label').textContent:null);await set(ref(db,"gameConfig/usedCodes/"+code),{cards:cardsResult,time:Date.now(),used:true});setStatus('Kode & kartu tersimpan ✓');unlocked=false;verifyBtn.disabled=true;codeInput.disabled=true;}catch(err){console.error(err);setStatus('Gagal menyimpan',false);}}
 
