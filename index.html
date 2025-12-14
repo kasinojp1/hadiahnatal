@@ -16,12 +16,12 @@
   --btn-hover:#ffd966;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{font-family:'Poppins',system-ui; background:linear-gradient(180deg,var(--bg1),var(--bg2)); color:#fff; min-height:100vh; padding:10px; overflow-x:hidden;}
+html,body{font-family:'Poppins',system-ui; background:linear-gradient(180deg,var(--bg1),var(--bg2)); color:#fff; min-height:100vh; padding:10px;}
 
 /* Header */
-header{display:flex; flex-direction:column; align-items:center; gap:10px; text-align:center; margin-bottom:20px; position:relative; z-index:2;}
+header{display:flex; flex-direction:column; align-items:center; gap:10px; text-align:center; margin-bottom:20px; position:relative;}
 
-/* Lampu Natal */
+/* Lampu Natal bergaris horizontal di atas judul */
 .lights-row {
   display:flex;
   justify-content:space-between;
@@ -64,7 +64,7 @@ header{display:flex; flex-direction:column; align-items:center; gap:10px; text-a
 .subtitle{font-size:14px; color:var(--muted);}
 
 /* Main Wrap */
-.wrap{width:100%; max-width:520px; margin:0 auto; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12)); border-radius:20px; padding:25px; border:1px solid rgba(212,175,55,0.08); box-shadow:0 15px 40px rgba(2,6,23,0.7); position:relative; z-index:2;}
+.wrap{width:100%; max-width:520px; margin:0 auto; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12)); border-radius:20px; padding:25px; border:1px solid rgba(212,175,55,0.08); box-shadow:0 15px 40px rgba(2,6,23,0.7);}
 
 /* Input Row */
 .code-row{display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-bottom:20px;}
@@ -75,7 +75,7 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
 .btn:disabled{opacity:.6; cursor:not-allowed;}
 #status{margin-top:5px; font-size:13px; color:var(--muted); text-align:center;}
 
-/* Prize List */
+/* Prize List - warna-warni animasi */
 .prize-section{margin-bottom:40px;}
 .prize-list{display:flex; flex-wrap:wrap; gap:12px; justify-content:center;}
 .prize{
@@ -121,25 +121,6 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
 .result{margin-top:20px; display:flex; flex-direction:column; gap:8px; align-items:center;}
 .result .small{color:var(--muted); font-size:13px;}
 
-/* Efek Salju & Bintang */
-.snowflake, .starfall{
-  position: fixed;
-  top: -10px;
-  font-size: 1em;
-  user-select: none;
-  pointer-events: none;
-  z-index: 9999;
-  animation-name: fall;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
-.snowflake{color:#fff;}
-.starfall{color:#ffd700;}
-@keyframes fall{
-  0% {transform: translateY(0) translateX(0) rotate(0deg);}
-  100% {transform: translateY(110vh) translateX(20px) rotate(360deg);}
-}
-
 @media (max-width:720px){.prize{flex:1 1 47%}.grid{grid-template-columns:repeat(2,1fr)}.card{height:130px}}
 </style>
 </head>
@@ -148,7 +129,7 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
 <main class="wrap" role="main" aria-live="polite">
   <header>
     <div class="lights-row">
-      <!-- Lampu Natal -->
+      <!-- Buat 20 lampu di atas judul -->
       <div class="light"></div><div class="light"></div><div class="light"></div><div class="light"></div>
       <div class="light"></div><div class="light"></div><div class="light"></div><div class="light"></div>
       <div class="light"></div><div class="light"></div><div class="light"></div><div class="light"></div>
@@ -168,6 +149,7 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
     <div id="status">Status: belum terkoneksi</div>
   </div>
 
+  <!-- Prize Section -->
   <div class="prize-section">
     <div class="prize-list">
       <div class="prize">🎁⛄ HADIAH PLATINUM<br/><small>10,000</small></div>
@@ -179,6 +161,7 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
     </div>
   </div>
 
+  <!-- Card Section -->
   <div class="grid-section">
     <section id="gridWrap" class="grid"></section>
   </div>
@@ -187,57 +170,128 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
 </main>
 
 <script type="module">
-// Firebase config dan logika kartu (tetap sama)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
-const firebaseConfig = { apiKey:"...", authDomain:"...", databaseURL:"...", projectId:"...", storageBucket:"...", messagingSenderId:"...", appId:"...", measurementId:"..." };
+const firebaseConfig = {
+  apiKey: "AIzaSyDlpuf_uIlpmr2ybAqpJ2GTTRW-t86PGf0",
+  authDomain: "hadiahnatal-a033b.firebaseapp.com",
+  databaseURL: "https://hadiahnatal-a033b-default-rtdb.firebaseio.com",
+  projectId: "hadiahnatal-a033b",
+  storageBucket: "hadiahnatal-a033b.appspot.com",
+  messagingSenderId: "577153304596",
+  appId: "1:577153304596:web:5f255e886a379ccb12bf01",
+  measurementId: "G-C5Q83YQ6SK"
+};
+
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const configRef = ref(db, "gameConfig/cards");
+
 const gridWrap = document.getElementById('gridWrap');
 const verifyBtn = document.getElementById('verifyBtn');
 const codeInput = document.getElementById('codeInput');
 const statusEl = document.getElementById('status');
 const resultArea = document.getElementById('resultArea');
-let serverConfig=null, unlocked=false, revealed=new Set(), maxSelect=3, selectedCount=0;
 
-function buildGrid(){gridWrap.innerHTML='';for(let i=0;i<9;i++){const c=document.createElement('div');c.className='card locked';c.dataset.index=i;c.innerHTML=`<div class="card-inner"><div class="card-front">Kartu ${i+1}</div><div class="card-back"><span class="label">?</span></div></div>`;c.addEventListener('click',onCardClick);gridWrap.appendChild(c);}}
-function setStatus(txt,ok=true){statusEl.textContent='Status: '+txt; statusEl.style.color=ok?'var(--muted)':'#ff9a9a';}
-onValue(configRef,snap=>{if(snap.exists()){serverConfig=snap.val();setStatus('Siap — data tersedia 🎁');if(!unlocked) buildGrid();} else{serverConfig=null;setStatus('Belum ada konfigurasi admin',false);buildGrid();}});
+let serverConfig = null;
+let unlocked = false;
+let revealed = new Set();
+const maxSelect = 3;
+let selectedCount = 0;
 
-async function verifyCode(code){try{const usedSnap = await get(ref(db,"gameConfig/usedCodes/"+code)); if(usedSnap.exists()){return {ok:false,msg:"Kode sudah dipakai. Silahkan hubungi admin"};} if(!serverConfig) return {ok:false,msg:"Tidak ada konfigurasi admin"}; if(code !== (serverConfig.code||'')) return {ok:false,msg:"Kode salah"}; return {ok:true,msg:"Kode valid"};}catch(err){console.error(err);return {ok:false,msg:"Error verifikasi"};}}
+function buildGrid(){
+  gridWrap.innerHTML='';
+  for(let i=0;i<9;i++){
+    const c=document.createElement('div');
+    c.className='card locked';
+    c.dataset.index=i;
+    c.innerHTML=`
+      <div class="card-inner">
+        <div class="card-front">Kartu ${i+1}</div>
+        <div class="card-back"><span class="label">?</span></div>
+      </div>`;
+    c.addEventListener('click',onCardClick);
+    gridWrap.appendChild(c);
+  }
+}
 
-async function onCardClick(e){if(selectedCount>=maxSelect) return; const el=e.currentTarget; const idx=Number(el.dataset.index); if(!unlocked||revealed.has(idx)) return; const cardsArr=serverConfig?.cards||[]; let val=cardsArr[idx]||'Kosong'; if(selectedCount>0 && val!==cardsArr[0]) val='ZONK'; el.classList.add('flip'); el.querySelector('.label').textContent=val; revealed.add(idx); selectedCount++; const msg=document.createElement('div'); msg.className='small'; msg.textContent=`Kamu membuka Kartu ${idx+1}: ${val}`; resultArea.prepend(msg); if(selectedCount>=maxSelect){await saveUsedCode(); document.querySelectorAll('.card').forEach(c=>c.classList.add('locked')); const info=document.createElement('div'); info.className='small'; info.textContent='🎉 Hadiah sudah keluar! Silahkan hubungi admin untuk claim'; resultArea.prepend(info);}}
+function setStatus(txt, ok=true){
+  statusEl.textContent='Status: '+txt;
+  statusEl.style.color=ok?'var(--muted)':'#ff9a9a';
+}
 
-async function saveUsedCode(){const code=(codeInput.value||'').trim(); if(!code){setStatus('Masukkan kode sebelum menyimpan',false);return;} if(!serverConfig){setStatus('Tidak ada konfigurasi admin',false);return;} try{const snap=await get(ref(db,"gameConfig/usedCodes/"+code)); if(snap.exists()){setStatus('Kode sudah dipakai, hubungi admin',false);return;} const cardsResult=Array.from(gridWrap.querySelectorAll('.card')).map(c=>c.classList.contains('flip')?c.querySelector('.label').textContent:null); await set(ref(db,"gameConfig/usedCodes/"+code),{cards:cardsResult,time:Date.now(),used:true}); setStatus('Kode & kartu tersimpan ✓'); unlocked=false; verifyBtn.disabled=true; codeInput.disabled=true;}catch(err){console.error(err); setStatus('Gagal menyimpan: '+(err.message||err),false);}}
+onValue(configRef,snap=>{
+  if(snap.exists()){serverConfig=snap.val();setStatus('Siap — data tersedia 🎁');if(!unlocked) buildGrid();}
+  else{serverConfig=null;setStatus('Belum ada konfigurasi admin',false);buildGrid();}
+});
 
-verifyBtn.addEventListener('click',async ()=>{const code=(codeInput.value||'').trim(); if(!code){setStatus('Masukkan kode dulu',false);return;} setStatus('Memeriksa kode...'); verifyBtn.disabled=true; const res=await verifyCode(code); verifyBtn.disabled=false; if(!res.ok){setStatus(res.msg,false);unlocked=false;document.querySelectorAll('.card').forEach(c=>c.classList.add('locked'));return;} unlocked=true; selectedCount=0; revealed.clear(); buildGrid(); setStatus('Kode benar — silakan pilih sampai 3 kartu 🎁');});
+async function verifyCode(code){
+  try{
+    const usedSnap = await get(ref(db,"gameConfig/usedCodes/"+code));
+    if(usedSnap.exists()){return {ok:false,msg:"Kode sudah dipakai. Silahkan hubungi admin"};}
+    if(!serverConfig) return {ok:false,msg:"Tidak ada konfigurasi admin"};
+    if(code !== (serverConfig.code||'')) return {ok:false,msg:"Kode salah"};
+    return {ok:true,msg:"Kode valid"};
+  }catch(err){console.error(err);return {ok:false,msg:"Error verifikasi"};}
+}
+
+async function onCardClick(e){
+  if(selectedCount>=maxSelect) return;
+  const el=e.currentTarget;
+  const idx=Number(el.dataset.index);
+  if(!unlocked || revealed.has(idx)) return;
+  const cardsArr=serverConfig?.cards||[];
+  let val=cardsArr[idx]||'Kosong';
+  if(selectedCount>0 && val!==cardsArr[0]) val='ZONK';
+  el.classList.add('flip');
+  el.querySelector('.label').textContent=val;
+  revealed.add(idx);
+  selectedCount++;
+  const msg=document.createElement('div'); msg.className='small';
+  msg.textContent=`Kamu membuka Kartu ${idx+1}: ${val}`;
+  resultArea.prepend(msg);
+  if(selectedCount>=maxSelect){
+    await saveUsedCode();
+    document.querySelectorAll('.card').forEach(c=>c.classList.add('locked'));
+    const info=document.createElement('div');
+    info.className='small';
+    info.textContent='🎉 Hadiah sudah keluar! Silahkan hubungi admin untuk claim';
+    resultArea.prepend(info);
+  }
+}
+
+async function saveUsedCode(){
+  const code=(codeInput.value||'').trim();
+  if(!code){setStatus('Masukkan kode sebelum menyimpan',false);return;}
+  if(!serverConfig){setStatus('Tidak ada konfigurasi admin',false);return;}
+  try{
+    const snap=await get(ref(db,"gameConfig/usedCodes/"+code));
+    if(snap.exists()){setStatus('Kode sudah dipakai, hubungi admin',false);return;}
+    const cardsResult=Array.from(gridWrap.querySelectorAll('.card'))
+      .map(c=>c.classList.contains('flip')?c.querySelector('.label').textContent:null);
+    await set(ref(db,"gameConfig/usedCodes/"+code),{cards:cardsResult,time:Date.now(),used:true});
+    setStatus('Kode & kartu tersimpan ✓');
+    unlocked=false;
+    verifyBtn.disabled=true;
+    codeInput.disabled=true;
+  }catch(err){console.error(err);setStatus('Gagal menyimpan: '+(err.message||err),false);}
+}
+
+verifyBtn.addEventListener('click',async ()=>{
+  const code=(codeInput.value||'').trim();
+  if(!code){setStatus('Masukkan kode dulu',false);return;}
+  setStatus('Memeriksa kode...');
+  verifyBtn.disabled=true;
+  const res=await verifyCode(code);
+  verifyBtn.disabled=false;
+  if(!res.ok){setStatus(res.msg,false);unlocked=false;document.querySelectorAll('.card').forEach(c=>c.classList.add('locked'));return;}
+  unlocked=true;selectedCount=0;revealed.clear();
+  buildGrid();
+  setStatus('Kode benar — silakan pilih sampai 3 kartu 🎁');
+});
 
 buildGrid();
-
-// Efek Salju dan Bintang Jatuh
-const snowCount=40, starCount=10;
-for(let i=0;i<snowCount;i++){
-  const snow=document.createElement('div');
-  snow.className='snowflake';
-  snow.style.left=Math.random()*window.innerWidth+'px';
-  snow.style.fontSize=(10+Math.random()*15)+'px';
-  snow.style.opacity=0.4+Math.random()*0.6;
-  snow.style.animationDuration=(5+Math.random()*10)+'s';
-  snow.innerHTML='❄️';
-  document.body.appendChild(snow);
-}
-for(let i=0;i<starCount;i++){
-  const star=document.createElement('div');
-  star.className='starfall';
-  star.style.left=Math.random()*window.innerWidth+'px';
-  star.style.fontSize=(12+Math.random()*18)+'px';
-  star.style.opacity=0.5+Math.random()*0.5;
-  star.style.animationDuration=(7+Math.random()*12)+'s';
-  star.innerHTML='✨';
-  document.body.appendChild(star);
-}
 </script>
 </body>
 </html>
