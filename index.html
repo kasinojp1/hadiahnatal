@@ -16,55 +16,25 @@
   --btn-hover:#ffd966;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{font-family:'Poppins',system-ui; background:linear-gradient(180deg,var(--bg1),var(--bg2)); color:#fff; min-height:100vh; padding:10px;}
+html,body{font-family:'Poppins',system-ui; background:linear-gradient(180deg,var(--bg1),var(--bg2)); color:#fff; min-height:100vh; padding:10px; overflow-x:hidden;}
 
 /* Header */
-header{display:flex; flex-direction:column; align-items:center; gap:10px; text-align:center; margin-bottom:20px; position:relative;}
-
-/* Lampu Natal bergaris horizontal di atas judul */
-.lights-row {
-  display:flex;
-  justify-content:space-between;
-  width:100%;
-  max-width:520px;
-  margin-bottom:8px;
-}
-.light {
-  width:12px;
-  height:12px;
-  border-radius:50%;
-  box-shadow:0 0 6px rgba(255,255,255,0.6);
-  animation:blink 1.5s infinite alternate;
-}
-.light:nth-child(4n+1){background:red; animation-delay:0s;}
-.light:nth-child(4n+2){background:green; animation-delay:.3s;}
-.light:nth-child(4n+3){background:yellow; animation-delay:.6s;}
-.light:nth-child(4n+4){background:blue; animation-delay:.9s;}
-
-@keyframes blink {
-  0% {opacity:0.3; transform:scale(0.8);}
-  50% {opacity:1; transform:scale(1);}
-  100% {opacity:0.3; transform:scale(0.8);}
-}
+header{display:flex; flex-direction:column; align-items:center; gap:10px; text-align:center; margin-bottom:20px; position:relative; z-index:2;}
+.lights-row{display:flex; justify-content:space-between; width:100%; max-width:520px; margin-bottom:8px;}
+.light{width:12px;height:12px;border-radius:50%;box-shadow:0 0 6px rgba(255,255,255,0.6);animation:blink 1.5s infinite alternate;}
+.light:nth-child(4n+1){background:red;animation-delay:0s;}
+.light:nth-child(4n+2){background:green;animation-delay:.3s;}
+.light:nth-child(4n+3){background:yellow;animation-delay:.6s;}
+.light:nth-child(4n+4){background:blue;animation-delay:.9s;}
+@keyframes blink{0%{opacity:0.3;transform:scale(0.8);}50%{opacity:1;transform:scale(1);}100%{opacity:0.3;transform:scale(0.8);}}
 
 /* Judul */
-.title h1{
-  font-size:28px;
-  background:linear-gradient(90deg,#ffef9f,#d4af37);
-  -webkit-background-clip:text;
-  color:transparent;
-  text-shadow:0 4px 18px rgba(212,175,55,.3);
-  position:relative;
-  animation:glow 1.5s infinite alternate;
-}
-@keyframes glow{
-  0%{text-shadow:0 0 8px #ffd966,0 0 12px #ffef9f;}
-  100%{text-shadow:0 0 16px #ffd966,0 0 24px #ffef9f;}
-}
-.subtitle{font-size:14px; color:var(--muted);}
+.title h1{font-size:28px;background:linear-gradient(90deg,#ffef9f,#d4af37);-webkit-background-clip:text;color:transparent;text-shadow:0 4px 18px rgba(212,175,55,.3);position:relative;animation:glow 1.5s infinite alternate;}
+@keyframes glow{0%{text-shadow:0 0 8px #ffd966,0 0 12px #ffef9f;}100%{text-shadow:0 0 16px #ffd966,0 0 24px #ffef9f;}}
+.subtitle{font-size:14px;color:var(--muted);}
 
-/* Main Wrap */
-.wrap{width:100%; max-width:520px; margin:0 auto; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12)); border-radius:20px; padding:25px; border:1px solid rgba(212,175,55,0.08); box-shadow:0 15px 40px rgba(2,6,23,0.7);}
+/* Wrap utama */
+.wrap{width:100%; max-width:520px; margin:0 auto; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.12)); border-radius:20px; padding:25px; border:1px solid rgba(212,175,55,0.08); box-shadow:0 15px 40px rgba(2,6,23,0.7); position:relative; z-index:2;}
 
 /* Input Row */
 .code-row{display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-bottom:20px;}
@@ -75,35 +45,14 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
 .btn:disabled{opacity:.6; cursor:not-allowed;}
 #status{margin-top:5px; font-size:13px; color:var(--muted); text-align:center;}
 
-/* Prize List - warna-warni animasi */
+/* Prize List */
 .prize-section{margin-bottom:40px;}
 .prize-list{display:flex; flex-wrap:wrap; gap:12px; justify-content:center;}
-.prize{
-  flex:1 1 28%;
-  min-width:160px;
-  padding:16px;
-  border-radius:16px;
-  background:linear-gradient(135deg,#d62828,#f94144,#ff6b6b,#ffd166);
-  color:#111;
-  font-weight:800;
-  text-align:center;
-  font-size:16px;
-  box-shadow:0 8px 35px rgba(0,0,0,.45);
-  border:2px solid rgba(255,255,255,.12);
-  position:relative;
-  transition:0.3s;
-  animation:colorChange 3s infinite alternate;
-}
+.prize{flex:1 1 28%; min-width:160px; padding:16px; border-radius:16px; background:linear-gradient(135deg,#d62828,#f94144,#ff6b6b,#ffd166); color:#111; font-weight:800; text-align:center; font-size:16px; box-shadow:0 8px 35px rgba(0,0,0,.45); border:2px solid rgba(255,255,255,.12); position:relative; transition:0.3s; animation:colorChange 3s infinite alternate;}
 .prize:hover{transform:translateY(-3px) scale(1.05); box-shadow:0 12px 45px rgba(212,175,55,.8);}
 .prize::before{content:"🎄"; position:absolute; left:10px; top:-10px; font-size:22px; animation:twinkle 1.5s infinite alternate;}
 @keyframes twinkle{0%{transform:scale(1);opacity:0.6;}50%{transform:scale(1.2);opacity:1;}100%{transform:scale(1);opacity:0.6;}}
-@keyframes colorChange{
-  0%{background:linear-gradient(135deg,#d62828,#f94144);}
-  25%{background:linear-gradient(135deg,#ff6b6b,#ffd166);}
-  50%{background:linear-gradient(135deg,#06d6a0,#1b9aaa);}
-  75%{background:linear-gradient(135deg,#ff9f1c,#ff4040);}
-  100%{background:linear-gradient(135deg,#d62828,#f94144);}
-}
+@keyframes colorChange{0%{background:linear-gradient(135deg,#d62828,#f94144);}25%{background:linear-gradient(135deg,#ff6b6b,#ffd166);}50%{background:linear-gradient(135deg,#06d6a0,#1b9aaa);}75%{background:linear-gradient(135deg,#ff9f1c,#ff4040);}100%{background:linear-gradient(135deg,#d62828,#f94144);}}
 .prize small{display:block; margin-top:6px; font-size:12px; color:#222;}
 
 /* Card Grid */
@@ -116,11 +65,19 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
 .card-front,.card-back{position:absolute; inset:0; border-radius:16px; display:flex; align-items:center; justify-content:center; font-weight:700; backface-visibility:hidden; padding:12px; text-align:center; transition:0.3s;}
 .card-front{background:linear-gradient(180deg,#071018,#0b1013); border:1px solid rgba(255,255,255,0.06); color:var(--muted); font-size:18px; box-shadow:0 4px 15px rgba(0,0,0,.4);}
 .card-back{background:linear-gradient(135deg,#fff7d0,#ffd87a); transform:rotateY(180deg); color:#111; font-size:18px; box-shadow:0 4px 15px rgba(0,0,0,.5);}
+.card:hover{box-shadow:0 0 25px var(--gold); transform:scale(1.05);}
 
 /* Result Area */
 .result{margin-top:20px; display:flex; flex-direction:column; gap:8px; align-items:center;}
 .result .small{color:var(--muted); font-size:13px;}
 
+/* Salju & Bintang jatuh */
+.snowflake, .starfall{position:fixed; top:-10px; font-size:1em; user-select:none; pointer-events:none; z-index:9999; animation-name:fall; animation-timing-function:linear; animation-iteration-count:infinite;}
+.snowflake{color:#fff;}
+.starfall{color:#ffd700;}
+@keyframes fall{0%{transform:translateY(0) translateX(0) rotate(0deg);}100%{transform:translateY(110vh) translateX(20px) rotate(360deg);}}
+
+/* Media Queries */
 @media (max-width:720px){.prize{flex:1 1 47%}.grid{grid-template-columns:repeat(2,1fr)}.card{height:130px}}
 </style>
 </head>
@@ -129,14 +86,12 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
 <main class="wrap" role="main" aria-live="polite">
   <header>
     <div class="lights-row">
-      <!-- Buat 20 lampu di atas judul -->
       <div class="light"></div><div class="light"></div><div class="light"></div><div class="light"></div>
       <div class="light"></div><div class="light"></div><div class="light"></div><div class="light"></div>
       <div class="light"></div><div class="light"></div><div class="light"></div><div class="light"></div>
       <div class="light"></div><div class="light"></div><div class="light"></div><div class="light"></div>
       <div class="light"></div><div class="light"></div><div class="light"></div><div class="light"></div>
     </div>
-
     <div class="title">
       <h1>Event Tebak Kartu — Natal KASINOJP</h1>
       <p class="subtitle">Masukkan kode yang diberikan admin, pilih maksimal 3 kartu — kode hanya sekali pakai</p>
@@ -149,7 +104,6 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
     <div id="status">Status: belum terkoneksi</div>
   </div>
 
-  <!-- Prize Section -->
   <div class="prize-section">
     <div class="prize-list">
       <div class="prize">🎁⛄ HADIAH PLATINUM<br/><small>10,000</small></div>
@@ -161,7 +115,6 @@ input[type="text"]:focus{outline:none; box-shadow:0 0 10px var(--gold);}
     </div>
   </div>
 
-  <!-- Card Section -->
   <div class="grid-section">
     <section id="gridWrap" class="grid"></section>
   </div>
@@ -248,6 +201,19 @@ async function onCardClick(e){
   el.querySelector('.label').textContent=val;
   revealed.add(idx);
   selectedCount++;
+  // efek partikel bintang saat klik kartu
+  for(let i=0;i<5;i++){
+    const star=document.createElement('div');
+    star.className='starfall';
+    star.style.left=(el.offsetLeft + Math.random()*el.offsetWidth)+'px';
+    star.style.top=(el.offsetTop)+'px';
+    star.style.fontSize=(8+Math.random()*12)+'px';
+    star.style.opacity=0.8;
+    star.style.animationDuration=(0.6+Math.random()*0.8)+'s';
+    star.innerHTML='✨';
+    document.body.appendChild(star);
+    setTimeout(()=>star.remove(),900);
+  }
   const msg=document.createElement('div'); msg.className='small';
   msg.textContent=`Kamu membuka Kartu ${idx+1}: ${val}`;
   resultArea.prepend(msg);
@@ -292,6 +258,27 @@ verifyBtn.addEventListener('click',async ()=>{
 });
 
 buildGrid();
+
+// Efek salju dan bintang jatuh
+const snowCount=40, starCount=10;
+for(let i=0;i<snowCount;i++){
+  const s=document.createElement('div');
+  s.className='snowflake';
+  s.style.left=Math.random()*100+'vw';
+  s.style.fontSize=(8+Math.random()*8)+'px';
+  s.style.animationDuration=(5+Math.random()*5)+'s';
+  s.textContent='❄';
+  document.body.appendChild(s);
+}
+for(let i=0;i<starCount;i++){
+  const s=document.createElement('div');
+  s.className='starfall';
+  s.style.left=Math.random()*100+'vw';
+  s.style.fontSize=(10+Math.random()*10)+'px';
+  s.style.animationDuration=(4+Math.random()*4)+'s';
+  s.textContent='✨';
+  document.body.appendChild(s);
+}
 </script>
 </body>
 </html>
